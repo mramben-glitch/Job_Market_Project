@@ -1,0 +1,6 @@
+beautifulsoup4==4.12.2
+requests==2.31.0
+python-dotenv==1.0.0
+pandas==2.2.0
+google-cloud-bigquery==3.14.1
+google-auth==2.27.0
