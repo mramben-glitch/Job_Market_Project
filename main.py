@@ -37,43 +37,57 @@ except OSError:
     print("[spaCy] Model not found. Install with: python -m spacy download en_core_web_sm")
     NLP = None
 
-# Skills keyword mapping
+# Skills keyword mapping (supercharged with word boundaries)
 SKILLS_KEYWORDS = {
     "R": r"\bR\b",
-    "Python": r"python",
-    "SQL": r"sql",
-    "Excel": r"excel",
-    "Power BI": r"power\s*bi",
-    "Tableau": r"tableau",
-    "AWS": r"aws|amazon\s*web\s*services",
-    "Azure": r"azure|microsoft\s*azure",
-    "Spark": r"spark|apache\s*spark",
-    "Snowflake": r"snowflake",
-    "Looker": r"looker",
+    "Python": r"\bpython\b",
+    "SQL": r"\bsql\b",
+    "Excel": r"\bexcel\b",
+    "Power BI": r"\bpower\s*bi\b|\bpowerbi\b",
+    "Tableau": r"\btableau\b",
+    "AWS": r"\baws\b|\bamazon\s*web\s*services\b",
+    "Azure": r"\bazure\b|\bmicrosoft\s*azure\b",
+    "Spark": r"\bspark\b|\bapache\s*spark\b",
+    "Snowflake": r"\bsnowflake\b",
+    "Looker": r"\blooker\b",
+    "GCP": r"\bgcp\b|\bgoogle\s*cloud\b|\bgoogle\s*cloud\s*platform\b",
+    "Pandas": r"\bpandas\b",
 }
 
 # Education keywords
 EDUCATION_KEYWORDS = {
-    "PhD": r"phd|doctorate|doctoral degree",
-    "Master's": r"master['s]*|m\.?a\.?|m\.?s\.?|m\.?b\.?a\.?",
-    "Bachelor's": r"bachelor['s]*|b\.?a\.?|b\.?s\.?|bachelor\s*degree",
+    "PhD": r"\bphd\b|\bdoctorate\b|\bdoctoral\s*degree\b",
+    "Master's": r"\bmaster['s]*\b|\bm\.?a\.?\b|\bm\.?s\.?\b|\bm\.?b\.?a\.?\b",
+    "Bachelor's": r"\bbachelor['s]*\b|\bb\.?a\.?\b|\bb\.?s\.?\b|\bbachelor\s*degree\b",
 }
 
-# Remote status keywords
+# Remote status keywords (aggressive matching)
 REMOTE_KEYWORDS = {
-    "Remote": r"remote|work\s*from\s*home|wfh|fully?\s*remote",
-    "Hybrid": r"hybrid|remote\s*hybrid|hybrid\s*remote|flexible|mixed",
-    "On-site": r"on[\s-]*site|onsite|office|in[\s-]*office|on[\s-]*location",
+    "Remote": r"\bremote\b|\bwork\s*from\s*home\b|\bwfh\b|\bfully?\s*remote\b|\btelecommute\b|\bvirtual\b",
+    "Hybrid": r"\bhybrid\b|\bdays\s*on\s*site\b|\bflexible\b|\bmixed\b",
+    "On-site": r"\bon[\s-]*site\b|\bonsite\b|\bin\s*office\b|\bin[\s-]*person\b|\boffice\b",
 }
 
-# Benefits keywords
+# Benefits keywords (aggressive matching)
 BENEFITS_KEYWORDS = {
-    "401k": r"401\(?k\)?|retirement",
-    "Health": r"health\s*insurance|medical|dental|vision",
-    "PTO": r"pto|paid\s*time\s*off|vacation|paid\s*leave",
-    "Bonus": r"bonus|signing\s*bonus",
-    "Stock": r"stock\s*options|equity|rsu",
+    "401(k)": r"\b401\(?k\)?\b|\bretirement\b|\b401k\b",
+    "Health Insurance": r"\bhealth\s*insurance\b|\bmedical\b|\bdental\b|\bvision\b|\bhealthcare\b",
+    "PTO": r"\bpto\b|\bpaid\s*time\s*off\b|\bvacation\b|\bpaid\s*leave\b",
+    "Bonus": r"\bbonus\b|\bsigning\s*bonus\b",
+    "Stock": r"\bstock\s*options\b|\bequity\b|\brsu\b",
 }
+
+# All US state abbreviations
+US_STATES = {
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC"
+}
+
+# Global counter for debugging
+JOBS_PROCESSED = 0
 
 
 def load_environment() -> None:
@@ -87,35 +101,51 @@ def load_environment() -> None:
 
 
 def extract_city_state(location: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
-    """Extract city and state using spaCy NER. Returns (city, state)."""
-    if not location or not NLP:
+    """
+    Smart location extraction with fallbacks:
+    1. Try spaCy NER for city/state
+    2. Fallback: scan raw string for US state abbreviations
+    3. Fallback: use first word as city guess
+    """
+    if not location:
         return None, None
     
-    try:
-        doc = NLP(location)
-        city = None
-        state = None
-        
-        # Look for GPE (Geo-Political Entity) entities
-        for ent in doc.ents:
-            if ent.label_ == "GPE":
-                # Try to identify if it's a state or city based on length and position
-                # US states are typically short (2-2 letters) or known state names
-                if len(ent.text) == 2 and ent.text.upper() in [
-                    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-                    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-                    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-                    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-                    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC"
-                ]:
-                    state = ent.text.upper()
-                else:
-                    if not city:
-                        city = ent.text
-        
-        return city, state
-    except Exception:
-        return None, None
+    location = location.strip()
+    city = None
+    state = None
+    
+    # Try spaCy NER first
+    if NLP:
+        try:
+            doc = NLP(location)
+            for ent in doc.ents:
+                if ent.label_ == "GPE":
+                    # Check if it's a state code
+                    if len(ent.text) == 2 and ent.text.upper() in US_STATES:
+                        state = ent.text.upper()
+                    else:
+                        if not city:
+                            city = ent.text
+        except Exception:
+            pass
+    
+    # Fallback: scan raw string for state abbreviations
+    if not state:
+        words = location.split(",")
+        for word in words:
+            word_clean = word.strip().upper()
+            if len(word_clean) == 2 and word_clean in US_STATES:
+                state = word_clean
+                break
+    
+    # Fallback: use first word as city if we don't have one
+    if not city:
+        words = location.split(",")
+        first_word = words[0].strip()
+        if first_word and len(first_word) > 0:
+            city = first_word
+    
+    return city, state
 
 
 def extract_skills(text: Optional[str]) -> Optional[str]:
@@ -149,7 +179,7 @@ def extract_education(text: Optional[str]) -> Optional[str]:
 
 
 def extract_remote_status(description: Optional[str], location: Optional[str]) -> Optional[str]:
-    """Extract remote status from description and location fields."""
+    """Extract remote status from description and location fields. Returns 'Remote', 'Hybrid', 'On-site', or 'Not Specified'."""
     combined_text = f"{description or ''} {location or ''}".lower()
     
     # Check in order: Remote, Hybrid, On-site
@@ -157,7 +187,8 @@ def extract_remote_status(description: Optional[str], location: Optional[str]) -
         if re.search(pattern, combined_text, re.IGNORECASE):
             return status
     
-    return None
+    # Default to "Not Specified" instead of None
+    return "Not Specified"
 
 
 def extract_benefits(text: Optional[str]) -> Optional[str]:
@@ -176,37 +207,85 @@ def extract_benefits(text: Optional[str]) -> Optional[str]:
 
 
 def parse_salary_range(salary_raw: Any) -> Tuple[Optional[float], Optional[float]]:
-    """Parse salary_raw to extract salary_min and salary_max as floats."""
+    """
+    Professional-grade salary parser handling:
+    - Commas in numbers (100,000)
+    - 'k' or 'K' suffix (multiply by 1000)
+    - Hourly rates (/hr or per hour, multiply by 2080 for annual)
+    - Ranges (80k-100k)
+    - Various formats
+    """
     if not salary_raw:
         return None, None
     
     try:
-        if isinstance(salary_raw, str):
-            # Try to parse as JSON first
-            try:
-                salary_raw = json.loads(salary_raw)
-            except json.JSONDecodeError:
-                # Try regex pattern: extract numbers from string
-                numbers = re.findall(r"\d+(?:,\d{3})*(?:\.\d+)?", salary_raw.replace(",", ""))
-                if len(numbers) >= 2:
-                    return float(numbers[0]), float(numbers[1])
-                elif len(numbers) == 1:
-                    return float(numbers[0]), None
-                return None, None
+        salary_text = str(salary_raw).lower().strip()
         
+        # Handle dictionary format (from APIs)
         if isinstance(salary_raw, dict):
             salary_min = salary_raw.get("salary_min")
             salary_max = salary_raw.get("salary_max")
             
-            if salary_min:
-                salary_min = float(salary_min) if isinstance(salary_min, (int, str)) else None
-            if salary_max:
-                salary_max = float(salary_max) if isinstance(salary_max, (int, str)) else None
+            min_val = None
+            max_val = None
             
-            return salary_min, salary_max
+            if salary_min:
+                try:
+                    min_val = float(str(salary_min).replace(",", ""))
+                except (ValueError, TypeError):
+                    pass
+            
+            if salary_max:
+                try:
+                    max_val = float(str(salary_max).replace(",", ""))
+                except (ValueError, TypeError):
+                    pass
+            
+            # Apply k multiplier if needed
+            if min_val and min_val < 1000 and "k" in str(salary_raw).lower():
+                min_val *= 1000
+            if max_val and max_val < 1000 and "k" in str(salary_raw).lower():
+                max_val *= 1000
+            
+            return min_val, max_val
         
-        if isinstance(salary_raw, (int, float)):
-            return float(salary_raw), None
+        # Check if hourly rate
+        is_hourly = "/hr" in salary_text or "per hour" in salary_text or "hourly" in salary_text
+        
+        # Extract all numbers (with optional commas and decimals)
+        numbers_raw = re.findall(r"[\d,]+\.?\d*", salary_text.replace(",", ""))
+        
+        if not numbers_raw:
+            return None, None
+        
+        # Convert to floats
+        numbers = []
+        for num_str in numbers_raw:
+            try:
+                num = float(num_str)
+                # Apply 'k' multiplier if number is small and followed by 'k' in original text
+                if num < 10000 and "k" in salary_text:
+                    # Check if this specific number had a 'k' after it
+                    if re.search(rf"{re.escape(num_str)}\s*k", salary_text):
+                        num *= 1000
+                numbers.append(num)
+            except ValueError:
+                continue
+        
+        if not numbers:
+            return None, None
+        
+        # Handle hourly: multiply by 2080 (standard work year: 40 hrs/week * 52 weeks)
+        if is_hourly:
+            numbers = [n * 2080 for n in numbers]
+        
+        # Sort and extract min/max
+        numbers.sort()
+        salary_min = numbers[0] if len(numbers) >= 1 else None
+        salary_max = numbers[-1] if len(numbers) >= 2 else None
+        
+        return salary_min, salary_max
+    
     except Exception:
         pass
     
@@ -214,49 +293,67 @@ def parse_salary_range(salary_raw: Any) -> Tuple[Optional[float], Optional[float
 
 
 def parse_relative_date(date_string: Optional[str]) -> Optional[str]:
-    """Convert relative date strings ('3 days ago') or any date string to YYYY-MM-DD format."""
+    """
+    Convert relative date strings or any date string to YYYY-MM-DD format.
+    Handles: '3 days ago', 'today', 'yesterday', '30+', relative dates, absolute dates.
+    """
     if not date_string or date_string == "":
         return None
     
     date_string = str(date_string).lower().strip()
     
     try:
-        # Handle relative date formats
-        if "ago" in date_string:
-            parts = date_string.split()
-            if len(parts) >= 2 and parts[0].isdigit():
-                num = int(parts[0])
-                unit = parts[1]
-                
-                if "day" in unit:
-                    target_date = datetime.now(timezone.utc) - timedelta(days=num)
-                elif "week" in unit:
-                    target_date = datetime.now(timezone.utc) - timedelta(weeks=num)
-                elif "month" in unit:
-                    target_date = datetime.now(timezone.utc) - timedelta(days=num * 30)
-                elif "hour" in unit:
-                    target_date = datetime.now(timezone.utc) - timedelta(hours=num)
-                else:
-                    return None
-                
-                return target_date.strftime("%Y-%m-%d")
-        
-        # Handle "today", "yesterday"
-        if "today" in date_string:
+        # Handle immediate/current dates
+        if "today" in date_string or "just now" in date_string or "just posted" in date_string:
             return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        
         if "yesterday" in date_string:
             return (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
         
-        # Try to parse as a standard date
-        parsed_date = date_parser.parse(date_string, fuzzy=False, ignoretz=True)
-        return parsed_date.strftime("%Y-%m-%d")
-    except Exception:
-        # Try one more time with fuzzy parsing
+        # Handle relative date formats with "ago"
+        if "ago" in date_string:
+            parts = date_string.split()
+            # Look for patterns like "3 days ago" or "30+ days ago"
+            for i, part in enumerate(parts):
+                # Extract number (handle "30+" format)
+                num_str = part.rstrip("+")
+                if num_str.isdigit():
+                    num = int(num_str)
+                    # Look for time unit in next part
+                    if i + 1 < len(parts):
+                        unit = parts[i + 1]
+                        if "day" in unit:
+                            target_date = datetime.now(timezone.utc) - timedelta(days=num)
+                        elif "week" in unit:
+                            target_date = datetime.now(timezone.utc) - timedelta(weeks=num)
+                        elif "month" in unit:
+                            target_date = datetime.now(timezone.utc) - timedelta(days=num * 30)
+                        elif "hour" in unit:
+                            target_date = datetime.now(timezone.utc) - timedelta(hours=num)
+                        else:
+                            continue
+                        return target_date.strftime("%Y-%m-%d")
+        
+        # Handle patterns like "30+" without "ago"
+        if "+" in date_string:
+            num_str = date_string.split("+")[0].strip()
+            if num_str.isdigit():
+                num = int(num_str)
+                # Default to days
+                target_date = datetime.now(timezone.utc) - timedelta(days=num)
+                return target_date.strftime("%Y-%m-%d")
+        
+        # Try to parse as a standard date (without fuzzy first)
         try:
-            parsed_date = date_parser.parse(date_string, fuzzy=True, ignoretz=True)
+            parsed_date = date_parser.parse(date_string, fuzzy=False, ignoretz=True)
             return parsed_date.strftime("%Y-%m-%d")
         except Exception:
-            return None
+            # Try with fuzzy parsing
+            parsed_date = date_parser.parse(date_string, fuzzy=True, ignoretz=True)
+            return parsed_date.strftime("%Y-%m-%d")
+    
+    except Exception:
+        return None
 
 
 def get_bigquery_client() -> bigquery.Client:
@@ -337,8 +434,12 @@ def build_row(
     date_posted: Any = None,
 ) -> Optional[Dict[str, Any]]:
     """Build a standardized job row for BigQuery with all 15 columns. Return None if filtered out."""
+    global JOBS_PROCESSED
+    
     if not strict_inclusion_filter(job_title):
         return None
+
+    JOBS_PROCESSED += 1
 
     location_str = location
     if isinstance(location, dict):
@@ -363,6 +464,10 @@ def build_row(
     
     # Parse date_posted
     date_posted_str = parse_relative_date(date_posted)
+
+    # Debugging: print every 10th job
+    if JOBS_PROCESSED % 10 == 0:
+        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status}")
 
     return {
         "job_title": job_title,
@@ -777,6 +882,9 @@ def load_rows_to_bigquery(rows: List[Dict[str, Any]], client: bigquery.Client) -
 
 def main() -> None:
     """Main pipeline: Smart ETL job data pipeline with NLP extraction."""
+    global JOBS_PROCESSED
+    JOBS_PROCESSED = 0  # Reset counter for this run
+    
     load_environment()
     client = get_bigquery_client()
     ensure_table_exists(client)
@@ -786,13 +894,14 @@ def main() -> None:
     print("=" * 70)
     print(f"Target roles: {', '.join(ROLES)}")
     print("\nSmart ETL Features:")
-    print("  • Salary parsing: min/max extraction")
-    print("  • Location parsing: city/state extraction via spaCy NER")
+    print("  • Salary parsing: min/max extraction with k-suffix & hourly conversion")
+    print("  • Location parsing: city/state extraction with state code fallback")
     print("  • Skills detection: R, Python, SQL, Excel, Power BI, Tableau, AWS, Azure, Spark, Snowflake, Looker")
     print("  • Education detection: Bachelor's, Master's, PhD")
-    print("  • Remote status detection: Remote, Hybrid, On-site")
-    print("  • Benefits detection: 401k, Health, PTO, Bonus, Stock")
-    print("  • Date parsing: Relative dates ('3 days ago') → standardized YYYY-MM-DD")
+    print("  • Remote status detection: Remote, Hybrid, On-site, Not Specified")
+    print("  • Benefits detection: 401(k), Health Insurance, PTO, Bonus, Stock")
+    print("  • Date parsing: 'today', 'yesterday', '3 days ago', '30+' → YYYY-MM-DD")
+    print("  • Debugging: Sample debug output every 10 jobs")
     print()
 
     existing_urls = get_existing_urls(client)
