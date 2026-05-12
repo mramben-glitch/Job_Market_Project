@@ -53,7 +53,12 @@ SKILLS_MAPPING = {
     "Pandas": ["pandas", "pd"],
     "R": [],  # R handled separately with strict word boundary
 }
-
+# Education keywords mapping
+EDUCATION_KEYWORDS = {
+    "Bachelor's": r"\bbachelor['s]*\b|\bb\.?a\.?\b|\bb\.?s\.?\b|\bundergraduate\b",
+    "Master's": r"\bmaster['s]*\b|\bm\.?s\.?\b|\bm\.?a\.?\b|\bmba\b",
+    "PhD": r"\bph\.?d\b|\bdoctorate\b"
+}
 # State Mapping (Both abbreviations and full names)
 STATE_MAPPING = {
     "AL": ["alabama", "al"],
