@@ -37,45 +37,109 @@ except OSError:
     print("[spaCy] Model not found. Install with: python -m spacy download en_core_web_sm")
     NLP = None
 
-# Skills keyword mapping (supercharged with word boundaries)
-SKILLS_KEYWORDS = {
-    "R": r"\bR\b",
-    "Python": r"\bpython\b",
-    "SQL": r"\bsql\b",
-    "Excel": r"\bexcel\b",
-    "Power BI": r"\bpower\s*bi\b|\bpowerbi\b",
-    "Tableau": r"\btableau\b",
-    "AWS": r"\baws\b|\bamazon\s*web\s*services\b",
-    "Azure": r"\bazure\b|\bmicrosoft\s*azure\b",
-    "Spark": r"\bspark\b|\bapache\s*spark\b",
-    "Snowflake": r"\bsnowflake\b",
-    "Looker": r"\blooker\b",
-    "GCP": r"\bgcp\b|\bgoogle\s*cloud\b|\bgoogle\s*cloud\s*platform\b",
-    "Pandas": r"\bpandas\b",
+# Comprehensive Skills Mapping with Variants (Fuzzy Tolerant)
+SKILLS_MAPPING = {
+    "Python": ["python", "py"],
+    "SQL": ["sql", "tsql", "plsql", "sqlite", "mysql", "postgresql", "oracle sql"],
+    "Excel": ["excel", "spreadsheet", "vba"],
+    "Power BI": ["power bi", "powerbi", "power-bi", "pbi"],
+    "Tableau": ["tableau", "tabpy"],
+    "AWS": ["aws", "amazon web services", "amazon aws"],
+    "Azure": ["azure", "microsoft azure", "az"],
+    "GCP": ["gcp", "google cloud", "google cloud platform", "bigquery"],
+    "Spark": ["spark", "apache spark", "pyspark"],
+    "Snowflake": ["snowflake", "sf"],
+    "Looker": ["looker", "look", "lml"],
+    "Pandas": ["pandas", "pd"],
+    "R": [],  # R handled separately with strict word boundary
 }
 
-# Education keywords
-EDUCATION_KEYWORDS = {
-    "PhD": r"\bphd\b|\bdoctorate\b|\bdoctoral\s*degree\b",
-    "Master's": r"\bmaster['s]*\b|\bm\.?a\.?\b|\bm\.?s\.?\b|\bm\.?b\.?a\.?\b",
-    "Bachelor's": r"\bbachelor['s]*\b|\bb\.?a\.?\b|\bb\.?s\.?\b|\bbachelor\s*degree\b",
+# State Mapping (Both abbreviations and full names)
+STATE_MAPPING = {
+    "AL": ["alabama", "al"],
+    "AK": ["alaska", "ak"],
+    "AZ": ["arizona", "az"],
+    "AR": ["arkansas", "ar"],
+    "CA": ["california", "ca"],
+    "CO": ["colorado", "co"],
+    "CT": ["connecticut", "ct"],
+    "DE": ["delaware", "de"],
+    "FL": ["florida", "fl"],
+    "GA": ["georgia", "ga"],
+    "HI": ["hawaii", "hi"],
+    "ID": ["idaho", "id"],
+    "IL": ["illinois", "il"],
+    "IN": ["indiana", "in"],
+    "IA": ["iowa", "ia"],
+    "KS": ["kansas", "ks"],
+    "KY": ["kentucky", "ky"],
+    "LA": ["louisiana", "la"],
+    "ME": ["maine", "me"],
+    "MD": ["maryland", "md"],
+    "MA": ["massachusetts", "mass", "ma"],
+    "MI": ["michigan", "mi"],
+    "MN": ["minnesota", "mn"],
+    "MS": ["mississippi", "ms"],
+    "MO": ["missouri", "mo"],
+    "MT": ["montana", "mt"],
+    "NE": ["nebraska", "ne"],
+    "NV": ["nevada", "nv"],
+    "NH": ["new hampshire", "nh"],
+    "NJ": ["new jersey", "nj"],
+    "NM": ["new mexico", "nm"],
+    "NY": ["new york", "ny"],
+    "NC": ["north carolina", "nc"],
+    "ND": ["north dakota", "nd"],
+    "OH": ["ohio", "oh"],
+    "OK": ["oklahoma", "ok"],
+    "OR": ["oregon", "or"],
+    "PA": ["pennsylvania", "penn", "pa"],
+    "RI": ["rhode island", "ri"],
+    "SC": ["south carolina", "sc"],
+    "SD": ["south dakota", "sd"],
+    "TN": ["tennessee", "tn"],
+    "TX": ["texas", "tx"],
+    "UT": ["utah", "ut"],
+    "VT": ["vermont", "vt"],
+    "VA": ["virginia", "va"],
+    "WA": ["washington", "wa"],
+    "WV": ["west virginia", "wv"],
+    "WI": ["wisconsin", "wi"],
+    "WY": ["wyoming", "wy"],
+    "DC": ["district of columbia", "washington dc", "dc"],
 }
 
-# Remote status keywords (aggressive matching)
-REMOTE_KEYWORDS = {
-    "Remote": r"\bremote\b|\bwork\s*from\s*home\b|\bwfh\b|\bfully?\s*remote\b|\btelecommute\b|\bvirtual\b",
-    "Hybrid": r"\bhybrid\b|\bdays\s*on\s*site\b|\bflexible\b|\bmixed\b",
-    "On-site": r"\bon[\s-]*site\b|\bonsite\b|\bin\s*office\b|\bin[\s-]*person\b|\boffice\b",
+# Comprehensive Benefits Dictionary (Aggressive Semantic Matching)
+BENEFITS_MAPPING = {
+    "401(k)": [
+        "401k", "401(k)", "401 k", "retirement", "401 (k)",
+        "retirement plan", "retirement savings", "roth", "matching"
+    ],
+    "Health Insurance": [
+        "health", "health insurance", "medical", "healthcare", "health coverage",
+        "dental", "vision", "health plan", "comprehensive health", "medical plan",
+        "health benefits", "dental coverage", "vision coverage", "eye care"
+    ],
+    "PTO": [
+        "pto", "paid time off", "vacation", "paid leave", "paid vacation",
+        "time off", "holiday", "holidays", "paid holiday", "personal days",
+        "days off", "leave", "annual leave", "sick leave", "paid sick"
+    ],
+    "Bonus": [
+        "bonus", "signing bonus", "sign on bonus", "performance bonus",
+        "annual bonus", "incentive", "bounty", "reward"
+    ],
+    "Stock": [
+        "stock", "stock option", "stock options", "equity", "rsu",
+        "restricted stock", "profit sharing", "shares"
+    ],
 }
 
-# Benefits keywords (aggressive matching)
-BENEFITS_KEYWORDS = {
-    "401(k)": r"\b401\(?k\)?\b|\bretirement\b|\b401k\b",
-    "Health Insurance": r"\bhealth\s*insurance\b|\bmedical\b|\bdental\b|\bvision\b|\bhealthcare\b",
-    "PTO": r"\bpto\b|\bpaid\s*time\s*off\b|\bvacation\b|\bpaid\s*leave\b",
-    "Bonus": r"\bbonus\b|\bsigning\s*bonus\b",
-    "Stock": r"\bstock\s*options\b|\bequity\b|\brsu\b",
-}
+# Create reverse lookup for benefits (for faster matching)
+BENEFITS_PATTERNS = {}
+for benefit_name, phrases in BENEFITS_MAPPING.items():
+    for phrase in phrases:
+        BENEFITS_PATTERNS[phrase] = benefit_name
 
 # All US state abbreviations
 US_STATES = {
@@ -102,10 +166,11 @@ def load_environment() -> None:
 
 def extract_city_state(location: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
     """
-    Smart location extraction with fallbacks:
-    1. Try spaCy NER for city/state
-    2. Fallback: scan raw string for US state abbreviations
-    3. Fallback: use first word as city guess
+    Robust location extraction with comprehensive fallback chain:
+    1. spaCy NER for GPE entities
+    2. Full state names and abbreviations (both directions)
+    3. Remote/non-geographic handling (US/National defaults)
+    4. First word fallback for city
     """
     if not location:
         return None, None
@@ -113,6 +178,17 @@ def extract_city_state(location: Optional[str]) -> Tuple[Optional[str], Optional
     location = location.strip()
     city = None
     state = None
+    
+    # Check for remote/non-geographic locations
+    location_lower = location.lower()
+    if any(term in location_lower for term in ["remote", "anywhere", "virtual", "distributed", "online", "work from home", "wfh"]):
+        # For remote positions without specific state, try to extract if mentioned
+        # e.g., "Remote - Texas" or "Remote, CA"
+        pass  # Fall through to extraction below
+    
+    # If explicitly "United States" or "USA" without state, default to "US"
+    if re.search(r"\bunited\s*states\b|\busa\b|^us$", location_lower):
+        return "USA", "US"
     
     # Try spaCy NER first
     if NLP:
@@ -129,38 +205,80 @@ def extract_city_state(location: Optional[str]) -> Tuple[Optional[str], Optional
         except Exception:
             pass
     
-    # Fallback: scan raw string for state abbreviations
+    # Fallback: Comprehensive state matching (abbreviations and full names)
     if not state:
-        words = location.split(",")
-        for word in words:
-            word_clean = word.strip().upper()
-            if len(word_clean) == 2 and word_clean in US_STATES:
-                state = word_clean
+        location_normalized = location.lower()
+        # Split by common delimiters
+        parts = re.split(r"[,\-|]", location_normalized)
+        for part in parts:
+            part = part.strip()
+            # Check each state mapping
+            for state_code, names in STATE_MAPPING.items():
+                for name_variant in names:
+                    # Exact word match
+                    if re.search(rf"\b{re.escape(name_variant)}\b", part):
+                        state = state_code
+                        break
+                if state:
+                    break
+            if state:
                 break
     
-    # Fallback: use first word as city if we don't have one
+    # Fallback: Extract first meaningful word as city
     if not city:
-        words = location.split(",")
-        first_word = words[0].strip()
-        if first_word and len(first_word) > 0:
-            city = first_word
+        # Remove state from location if we found it
+        location_for_city = location
+        if state:
+            # Try to remove the state from location string
+            for state_code, names in STATE_MAPPING.items():
+                if state_code == state:
+                    for name_variant in names:
+                        location_for_city = re.sub(rf"\b{re.escape(name_variant)}\b", "", location_for_city, flags=re.IGNORECASE)
+        
+        # Get first non-empty, non-delimiter part
+        parts = re.split(r"[,\-|]", location_for_city)
+        for part in parts:
+            part = part.strip()
+            if part and len(part) > 0 and not re.match(r"^\d+$", part):  # Skip numbers
+                city = part
+                break
+    
+    # If still no city but we have state, construct a default
+    if not city and state:
+        city = f"Multiple Cities, {state}"
     
     return city, state
 
 
 def extract_skills(text: Optional[str]) -> Optional[str]:
-    """Extract skills from job description. Returns comma-separated skills."""
+    """
+    Bulletproof skills extraction with fuzzy matching and punctuation tolerance.
+    Handles variations like PowerBI, Power-BI, Node.js, Node JS, etc.
+    Exception: R uses strict word boundary matching.
+    """
     if not text:
         return None
     
     text_lower = text.lower()
-    found_skills = []
+    # Normalize punctuation/spacing for matching (but preserve for strict R)
+    text_normalized = re.sub(r"[_\-\s.]+", " ", text_lower)
     
-    for skill, pattern in SKILLS_KEYWORDS.items():
-        if re.search(pattern, text_lower, re.IGNORECASE):
-            found_skills.append(skill)
+    found_skills = set()
     
-    return ", ".join(found_skills) if found_skills else None
+    # Check R with strict word boundary (case-insensitive match but keep original case)
+    if re.search(r"\br\b", text_lower, re.IGNORECASE):
+        found_skills.add("R")
+    
+    # Check all other skills using fuzzy variant matching
+    for skill_name, variants in SKILLS_MAPPING.items():
+        for variant in variants:
+            # Create flexible pattern: handles punctuation and spacing
+            pattern = re.sub(r"[_\-\s.]+", r"[\\s._-]*", re.escape(variant))
+            if re.search(rf"\b{pattern}\b", text_normalized, re.IGNORECASE):
+                found_skills.add(skill_name)
+                break  # Found this skill, move to next
+    
+    return ", ".join(sorted(found_skills)) if found_skills else None
 
 
 def extract_education(text: Optional[str]) -> Optional[str]:
@@ -192,18 +310,30 @@ def extract_remote_status(description: Optional[str], location: Optional[str]) -
 
 
 def extract_benefits(text: Optional[str]) -> Optional[str]:
-    """Extract benefits from job description. Returns comma-separated benefits."""
+    """
+    Aggressive semantic benefits matching using comprehensive phrase library.
+    Handles dozens of variations for each benefit category.
+    Returns comma-separated benefits or None if none found.
+    """
     if not text:
         return None
     
     text_lower = text.lower()
-    found_benefits = []
+    # Normalize punctuation and spacing
+    text_normalized = re.sub(r"[_\-\s.]+", " ", text_lower)
     
-    for benefit, pattern in BENEFITS_KEYWORDS.items():
-        if re.search(pattern, text_lower, re.IGNORECASE):
-            found_benefits.append(benefit)
+    found_benefits = set()
     
-    return ", ".join(found_benefits) if found_benefits else None
+    # Check each benefit against its comprehensive phrase list
+    for benefit_name, phrases in BENEFITS_MAPPING.items():
+        for phrase in phrases:
+            # Create flexible pattern for punctuation/spacing
+            pattern = re.sub(r"[_\-\s.]+", r"[\\s._-]*", re.escape(phrase))
+            if re.search(rf"\b{pattern}\b", text_normalized, re.IGNORECASE):
+                found_benefits.add(benefit_name)
+                break  # Found this benefit, move to next
+    
+    return ", ".join(sorted(found_benefits)) if found_benefits else None
 
 
 def parse_salary_range(salary_raw: Any) -> Tuple[Optional[float], Optional[float]]:
@@ -292,13 +422,36 @@ def parse_salary_range(salary_raw: Any) -> Tuple[Optional[float], Optional[float
     return None, None
 
 
-def parse_relative_date(date_string: Optional[str]) -> Optional[str]:
+def parse_relative_date(date_string: Optional[str], api_dict: Optional[Dict[str, Any]] = None, fallback_date: Optional[str] = None) -> str:
     """
-    Convert relative date strings or any date string to YYYY-MM-DD format.
-    Handles: '3 days ago', 'today', 'yesterday', '30+', relative dates, absolute dates.
+    Ironclad date parsing with FORCED FALLBACK to today's date.
+    
+    Steps:
+    1. Check api_dict for standard date keys (created_at, date, publication_date, etc.)
+    2. Parse relative formats ("3 days ago", "today", "yesterday", "30+")
+    3. Parse absolute date formats
+    4. FORCED FALLBACK: If nothing works, return fallback_date (today's date)
+    
+    NEVER returns None. Always returns YYYY-MM-DD.
     """
+    # First, try to extract from API dict if provided
+    if api_dict and isinstance(api_dict, dict):
+        date_candidates = [
+            "created_at", "created", "date", "publication_date", "posted_date",
+            "update_date", "published_at", "posted", "posted_on", "date_posted"
+        ]
+        for key in date_candidates:
+            if key in api_dict and api_dict[key]:
+                try:
+                    parsed = parse_relative_date(str(api_dict[key]), None, fallback_date)
+                    if parsed:
+                        return parsed
+                except Exception:
+                    continue
+    
+    # If no date_string provided, use fallback immediately
     if not date_string or date_string == "":
-        return None
+        return fallback_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
     date_string = str(date_string).lower().strip()
     
@@ -313,11 +466,10 @@ def parse_relative_date(date_string: Optional[str]) -> Optional[str]:
         # Handle relative date formats with "ago"
         if "ago" in date_string:
             parts = date_string.split()
-            # Look for patterns like "3 days ago" or "30+ days ago"
             for i, part in enumerate(parts):
                 # Extract number (handle "30+" format)
-                num_str = part.rstrip("+")
-                if num_str.isdigit():
+                num_str = part.rstrip("+").rstrip(".")
+                if num_str.replace("-", "").isdigit():
                     num = int(num_str)
                     # Look for time unit in next part
                     if i + 1 < len(parts):
@@ -336,14 +488,14 @@ def parse_relative_date(date_string: Optional[str]) -> Optional[str]:
         
         # Handle patterns like "30+" without "ago"
         if "+" in date_string:
-            num_str = date_string.split("+")[0].strip()
+            num_str = date_string.split("+")[0].strip().rstrip(".")
             if num_str.isdigit():
                 num = int(num_str)
                 # Default to days
                 target_date = datetime.now(timezone.utc) - timedelta(days=num)
                 return target_date.strftime("%Y-%m-%d")
         
-        # Try to parse as a standard date (without fuzzy first)
+        # Try to parse as a standard date (without fuzzy first for accuracy)
         try:
             parsed_date = date_parser.parse(date_string, fuzzy=False, ignoretz=True)
             return parsed_date.strftime("%Y-%m-%d")
@@ -353,7 +505,10 @@ def parse_relative_date(date_string: Optional[str]) -> Optional[str]:
             return parsed_date.strftime("%Y-%m-%d")
     
     except Exception:
-        return None
+        pass
+    
+    # FORCED FALLBACK: If we reach here, return today's date
+    return fallback_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
 def get_bigquery_client() -> bigquery.Client:
@@ -432,6 +587,7 @@ def build_row(
     salary_raw: Any,
     job_url: Optional[str],
     date_posted: Any = None,
+    api_dict: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
     """Build a standardized job row for BigQuery with all 15 columns. Return None if filtered out."""
     global JOBS_PROCESSED
@@ -462,12 +618,15 @@ def build_row(
     # Parse salary
     salary_min, salary_max = parse_salary_range(salary_raw)
     
-    # Parse date_posted
-    date_posted_str = parse_relative_date(date_posted)
+    # Get today's date for fallback
+    today_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Parse date_posted with ironclad fallback to today's date
+    date_posted_str = parse_relative_date(date_posted, api_dict, today_date)
 
     # Debugging: print every 10th job
     if JOBS_PROCESSED % 10 == 0:
-        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status}")
+        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status} | Skills: {skills or 'N/A'}")
 
     return {
         "job_title": job_title,
@@ -484,7 +643,7 @@ def build_row(
         "remote_status": remote_status,
         "benefits": benefits,
         "date_retrieved": get_date_retrieved(),
-        "date_posted": date_posted_str,
+        "date_posted": date_posted_str,  # GUARANTEED non-null YYYY-MM-DD
     }
 
 
@@ -546,6 +705,7 @@ def fetch_adzuna(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         },
                         job_url=job_url,
                         date_posted=item.get("posted_date"),
+                        api_dict=item,
                     )
                     if row:
                         rows.append(row)
@@ -599,6 +759,7 @@ def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=item.get("salary"),
                         job_url=job_url,
                         date_posted=item.get("update_date") or item.get("posted_date"),
+                        api_dict=item,
                     )
                     if row:
                         rows.append(row)
@@ -666,6 +827,7 @@ def fetch_usajobs(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=descriptor.get("PositionRemuneration"),
                         job_url=job_url,
                         date_posted=descriptor.get("PublicationStartDate"),
+                        api_dict=descriptor,
                     )
                     if row:
                         rows.append(row)
@@ -715,6 +877,7 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=item.get("salary"),
                         job_url=job_url,
                         date_posted=item.get("published_at"),
+                        api_dict=item,
                     )
                     if row:
                         rows.append(row)
@@ -761,6 +924,7 @@ def fetch_remotive(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=item.get("salary"),
                         job_url=job_url,
                         date_posted=item.get("publication_date"),
+                        api_dict=item,
                     )
                     if row:
                         rows.append(row)
@@ -807,6 +971,7 @@ def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=item.get("salary"),
                         job_url=job_url,
                         date_posted=item.get("publication_date") or item.get("posted_date"),
+                        api_dict=item,
                     )
                     if row:
                         rows.append(row)
