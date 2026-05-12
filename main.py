@@ -113,7 +113,12 @@ STATE_MAPPING = {
     "WY": ["wyoming", "wy"],
     "DC": ["district of columbia", "washington dc", "dc"],
 }
-
+# Remote status keywords (aggressive matching)
+REMOTE_KEYWORDS = {
+    "Remote": r"\bremote\b|\bwork\s*from\s*home\b|\bwfh\b|\bfully\s*remote\b|\btelecommute\b|\bvirtual\b",
+    "Hybrid": r"\bhybrid\b|\bdays\s*on\s*site\b|\bflexible\b|\bmixed\b",
+    "On-site": r"\bon[\s-]*site\b|\bonsite\b|\bin\s*office\b|\bin[\s-]*person\b|\boffice\b"
+}
 # Comprehensive Benefits Dictionary (Aggressive Semantic Matching)
 BENEFITS_MAPPING = {
     "401(k)": [
