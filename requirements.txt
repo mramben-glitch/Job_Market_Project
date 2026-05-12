@@ -4,3 +4,5 @@ python-dotenv==1.0.0
 pandas==2.2.0
 google-cloud-bigquery==3.14.1
 google-auth==2.27.0
+spacy
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
