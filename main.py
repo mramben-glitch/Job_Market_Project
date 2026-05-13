@@ -2,9 +2,12 @@ import json
 import os
 import re
 import time
+import unicodedata
 from datetime import datetime, timezone, timedelta
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+import geonamescache
 import pandas as pd
 import requests
 import spacy
@@ -37,89 +40,439 @@ except OSError:
     print("[spaCy] Model not found. Install with: python -m spacy download en_core_web_sm")
     NLP = None
 
-# Comprehensive Skills Mapping with Variants (Fuzzy Tolerant)
-SKILLS_MAPPING = {
-    "Python": ["python", "py"],
-    "SQL": ["sql", "tsql", "plsql", "sqlite", "mysql", "postgresql", "oracle sql"],
-    "Excel": ["excel", "spreadsheet", "vba"],
-    "Power BI": ["power bi", "powerbi", "power-bi", "pbi"],
-    "Tableau": ["tableau", "tabpy"],
-    "AWS": ["aws", "amazon web services", "amazon aws"],
-    "Azure": ["azure", "microsoft azure", "az"],
-    "GCP": ["gcp", "google cloud", "google cloud platform", "bigquery"],
-    "Spark": ["spark", "apache spark", "pyspark"],
-    "Snowflake": ["snowflake", "sf"],
-    "Looker": ["looker", "look", "lml"],
-    "Pandas": ["pandas", "pd"],
-    "R": [],  # R handled separately with strict word boundary
-}
-# Education keywords mapping
+# ──────────────────────────────────────────────────────────────────────────────
+# SHARED HELPERS FOR GEO & EXTRACTION
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _normalize(text: str) -> str:
+    """Lowercase, strip accents, collapse whitespace."""
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
+    return re.sub(r"\s+", " ", text).strip().lower()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# STATE EXTRACTION (powered by geonamescache — fully offline)
+# ──────────────────────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=1)
+def _build_geo_lookups():
+    """
+    Build and cache all lookup tables from geonamescache.
+    Called once per process; subsequent calls hit the LRU cache instantly.
+    """
+    gc = geonamescache.GeonamesCache(min_city_population=500)
+
+    # --- US states ---
+    us_states = gc.get_us_states()
+    state_name_to_abbr: dict[str, str] = {v["name"].lower(): k for k, v in us_states.items()}
+    abbr_set = frozenset(us_states.keys())
+
+    # --- Cities (primary + alternate names, US only, pop >= 500) ---
+    city_to_state_raw: dict[str, list[tuple[str, int]]] = {}
+    for v in gc.get_cities().values():
+        if v["countrycode"] != "US":
+            continue
+        state = v["admin1code"]
+        pop   = v.get("population", 0)
+        city_to_state_raw.setdefault(v["name"].lower(), []).append((state, pop))
+        for alt in v.get("alternatenames", []):
+            if alt and len(alt) > 2:
+                city_to_state_raw.setdefault(alt.lower(), []).append((state, pop))
+
+    # When a city name appears in multiple states, keep the most populous one.
+    city_map: dict[str, str] = {
+        name: max(entries, key=lambda x: x[1])[0]
+        for name, entries in city_to_state_raw.items()
+    }
+
+    # --- Counties (full FIPS dataset, 3,235 entries) ---
+    _COUNTY_SUFFIXES = (
+        " county", " parish", " borough",
+        " census area", " municipality", " city and borough",
+    )
+    county_multi: dict[str, list[str]] = {}
+    for c in gc.get_us_counties():
+        name = c["name"].lower()
+        for suffix in _COUNTY_SUFFIXES:
+            if name.endswith(suffix):
+                name = name[: -len(suffix)]
+                break
+        name = name.strip()
+        county_multi.setdefault(name, []).append(c["state"])
+
+    # Unambiguous = county name maps to exactly one state across the whole US.
+    county_unambiguous: dict[str, str] = {
+        k: v[0] for k, v in county_multi.items() if len(v) == 1
+    }
+
+    return state_name_to_abbr, abbr_set, city_map, county_unambiguous, county_multi
+
+
+_RE_COUNTY_SUFFIX = re.compile(
+    r"([A-Za-z .'\-]+?)\s+(?:County|Parish|Borough|Municipality)\b",
+    re.IGNORECASE,
+)
+_RE_STATE_US = re.compile(
+    r"([A-Za-z ]+),\s*(?:US|USA|U\.S\.A?\.?)\b",
+    re.IGNORECASE,
+)
+
+
+def extract_state(location: str, description: str = "") -> Optional[str]:
+    """
+    Return a 2-letter US state abbreviation or None.
+    Resolution order (first match wins):
+        1. 2-letter abbreviation token in location string
+        2. Full state name in location string
+        3. "State, US/USA" pattern in location string
+        4. Unambiguous county name in location string
+        5. City / alternate city name in location string
+        6. Ambiguous county + city context for disambiguation
+        7. Full state name in first 2,000 chars of description
+        8. 2-letter abbreviation in first 500 chars of description (last resort)
+    """
+    state_name_to_abbr, abbr_set, city_map, county_unambiguous, county_multi = (
+        _build_geo_lookups()
+    )
+
+    loc  = location or ""
+    desc = description or ""
+
+    # ── 1. 2-letter abbreviation token ─────────────────────────────────────
+    for token in re.split(r"[,/|;\s]+", loc):
+        t = token.strip().upper()
+        if t in abbr_set:
+            return t
+
+    # ── 2. Full state name ─────────────────────────────────────────────────
+    loc_norm = _normalize(loc)
+    for name, abbr in state_name_to_abbr.items():
+        if re.search(r"\b" + re.escape(name) + r"\b", loc_norm):
+            return abbr
+
+    # ── 3. "State, US/USA" pattern ────────────────────────────────────────
+    m = _RE_STATE_US.search(loc)
+    if m:
+        candidate = m.group(1).strip().lower()
+        if candidate in state_name_to_abbr:
+            return state_name_to_abbr[candidate]
+
+    # ── 4. Unambiguous county name ────────────────────────────────────────
+    for m in _RE_COUNTY_SUFFIX.finditer(loc):
+        county = _normalize(m.group(1))
+        if county in county_unambiguous:
+            return county_unambiguous[county]
+
+    # ── 5. City name lookup (each comma-segment + full string) ────────────
+    segments = [s.strip() for s in loc_norm.split(",")]
+    for seg in [loc_norm] + segments:
+        seg = seg.strip()
+        if seg and seg in city_map:
+            return city_map[seg]
+
+    # ── 6. Ambiguous county + city disambiguation ──────────────────────────
+    for m in _RE_COUNTY_SUFFIX.finditer(loc):
+        county = _normalize(m.group(1))
+        if county in county_multi:
+            candidates = set(county_multi[county])
+            for seg in segments:
+                seg = seg.strip()
+                if seg and seg in city_map and city_map[seg] in candidates:
+                    return city_map[seg]
+            if len(candidates) == 1:
+                return next(iter(candidates))
+
+    # ── 7. State name in description ───────────────────────────────────────
+    if desc:
+        desc_norm = _normalize(desc[:2000])
+        for name, abbr in state_name_to_abbr.items():
+            if re.search(r"\b" + re.escape(name) + r"\b", desc_norm):
+                return abbr
+
+    # ── 8. Abbreviation in description (last resort) ────────────────────────
+    if desc:
+        abbr_pattern = re.compile(
+            r"(?<![A-Za-z])("
+            + "|".join(sorted(abbr_set, key=len, reverse=True))
+            + r")(?![A-Za-z])"
+        )
+        m = abbr_pattern.search(desc[:500])
+        if m:
+            return m.group(1).upper()
+
+    return None
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# SKILLS EXTRACTION (role-specific: Analyst / Data Scientist)
+# ──────────────────────────────────────────────────────────────────────────────
+
+_SKILLS_RAW: list[tuple[str, list[str]]] = [
+    # ── Core Languages ────────────────────────────────────────────────────
+    ("Python",          [r"python"]),
+    ("SQL",             [r"\bsql\b", r"structured\s+query\s+language"]),
+    ("DAX",             [r"\bdax\b"]),
+    ("M (Power Query)", [r"power\s*query\b", r"\bm\s+language\b"]),
+    ("VBA",             [r"\bvba\b"]),
+    ("MDX",             [r"\bmdx\b"]),
+    ("Scala",           [r"\bscala\b"]),
+    
+    # ── Excel ─────────────────────────────────────────────────────────────
+    ("Excel",           [r"\bexcel\b", r"microsoft\s+excel", r"ms\s+excel"]),
+    ("VLOOKUP",         [r"\bv?hlookup\b", r"\bvlookup\b"]),
+    ("INDEX MATCH",     [r"\bindex[\s/]+match\b"]),
+    ("XLOOKUP",         [r"\bxlookup\b"]),
+    ("Pivot Tables",    [r"pivot\s+table", r"pivottable"]),
+    ("Advanced Excel",  [r"advanced\s+excel", r"excel\s+advanced"]),
+    ("Conditional Formatting", [r"conditional\s+formatting"]),
+    ("Macros",          [r"\bmacros?\b(?!\s*economics)"]),
+    ("Power Pivot",     [r"power\s*pivot"]),
+    ("Excel Dashboards",[r"excel\s+dashboard"]),
+    
+    # ── BI & Visualization ────────────────────────────────────────────────
+    ("Tableau",         [r"tableau"]),
+    ("Power BI",        [r"power[\s\-]?bi"]),
+    ("Looker",          [r"\blooker\b(?!\s*studio)"]),
+    ("Looker Studio",   [r"looker\s+studio", r"google\s+data\s+studio", r"data\s+studio"]),
+    ("Qlik",            [r"qlik(?:view|sense|\.com)?"]),
+    ("Metabase",        [r"metabase"]),
+    ("Grafana",         [r"grafana"]),
+    ("Superset",        [r"apache\s*superset", r"\bsuperset\b"]),
+    ("Sisense",         [r"sisense"]),
+    ("MicroStrategy",   [r"microstrategy"]),
+    ("TIBCO Spotfire",  [r"spotfire"]),
+    ("SAP BusinessObjects", [r"sap\s*bo\b", r"business\s*objects"]),
+    ("Domo",            [r"\bdomo\b"]),
+    ("ThoughtSpot",     [r"thoughtspot"]),
+    
+    # ── Databases & Querying ──────────────────────────────────────────────
+    ("PostgreSQL",      [r"postgres(?:ql)?"]),
+    ("MySQL",           [r"mysql"]),
+    ("SQL Server",      [r"sql\s+server", r"\bmssql\b", r"\bt-sql\b", r"\btsql\b"]),
+    ("Oracle DB",       [r"\boracle\b(?:\s*db|\s*database|\s*sql)?"]),
+    ("SQLite",          [r"sqlite"]),
+    ("BigQuery",        [r"big\s*query", r"\bgbq\b"]),
+    ("Snowflake",       [r"snowflake"]),
+    ("Redshift",        [r"redshift"]),
+    ("Databricks",      [r"databricks"]),
+    ("Teradata",        [r"teradata"]),
+    ("Hive",            [r"\bhive\s*ql\b", r"\bhive\b"]),
+    ("MongoDB",         [r"mongo(?:db)?"]),
+    ("NoSQL",           [r"\bnosql\b"]),
+    
+    # ── Cloud Platforms ───────────────────────────────────────────────────
+    ("AWS",             [r"\baws\b", r"amazon\s+web\s+services"]),
+    ("Azure",           [r"microsoft\s+azure", r"\bazure\b"]),
+    ("GCP",             [r"\bgcp\b", r"google\s+cloud"]),
+    
+    # ── ETL / Data Pipeline ───────────────────────────────────────────────
+    ("dbt",             [r"\bdbt\b", r"data\s+build\s+tool"]),
+    ("Airflow",         [r"\bairflow\b"]),
+    ("Fivetran",        [r"fivetran"]),
+    ("Stitch",          [r"\bstitch\b(?:\s*data)?"]),
+    ("Informatica",     [r"informatica"]),
+    ("Talend",          [r"\btalend\b"]),
+    ("SSIS",            [r"\bssis\b"]),
+    
+    # ── Statistics & Analytics ────────────────────────────────────────────
+    ("Statistics",      [r"\bstatistics\b", r"\bstatistical\s+analysis\b"]),
+    ("Probability",     [r"\bprobability\b"]),
+    ("A/B Testing",     [r"a\s*/\s*b\s+test", r"\bsplit\s+test", r"hypothesis\s+test"]),
+    ("Regression Analysis", [r"(?:linear|logistic|multiple)\s+regression", r"regression\s+analysis"]),
+    ("Time Series",     [r"time[\s\-]+series", r"\barima\b", r"\bsarima\b", r"\bprophet\b"]),
+    ("Forecasting",     [r"\bforecasting\b", r"demand\s+forecast"]),
+    ("Bayesian Analysis",[r"bayesian", r"\bbayes\b"]),
+    ("Clustering",      [r"\bclustering\b", r"\bk[\s\-]?means\b"]),
+    ("Cohort Analysis", [r"cohort\s+analysis"]),
+    ("Funnel Analysis", [r"funnel\s+analysis"]),
+    ("Causal Inference",[r"causal\s+inference", r"causal\s+analysis"]),
+    ("Survival Analysis",[r"survival\s+analysis", r"churn\s+model"]),
+    ("Multivariate Analysis",[r"multivariate\s+analysis", r"\bmanova\b", r"\banova\b"]),
+    ("Monte Carlo",     [r"monte\s+carlo"]),
+    ("Optimization",    [r"\boptimization\b", r"linear\s+programming"]),
+    
+    # ── Machine Learning & AI (Data Scientist) ────────────────────────────
+    ("Machine Learning",[r"machine\s+learning", r"\bml\b(?=\s+model|\s+pipeline)"]),
+    ("Deep Learning",   [r"deep\s+learning", r"neural\s+net(?:work)?"]),
+    ("NLP",             [r"\bnlp\b", r"natural\s+language\s+processing"]),
+    ("Computer Vision", [r"computer\s+vision", r"image\s+recognition"]),
+    ("Generative AI",   [r"gen(?:erative)?\s*ai", r"\bllm\b", r"large\s+language\s+model", r"chatgpt"]),
+    ("Feature Engineering",[r"feature\s+engineering", r"feature\s+selection"]),
+    ("Model Validation",[r"model\s+validat", r"cross[\s\-]+validation"]),
+    ("scikit-learn",    [r"scikit[\s\-]*learn", r"\bsklearn\b"]),
+    ("TensorFlow",      [r"tensor\s*flow"]),
+    ("PyTorch",         [r"py\s*torch"]),
+    ("Keras",           [r"\bkeras\b"]),
+    ("XGBoost",         [r"xgboost", r"xg\s*boost"]),
+    ("LightGBM",        [r"light\s*gbm", r"lightgbm"]),
+    ("MLflow",          [r"mlflow"]),
+    
+    # ── Python Libraries ──────────────────────────────────────────────────
+    ("Pandas",          [r"\bpandas\b"]),
+    ("NumPy",           [r"\bnumpy\b"]),
+    ("Matplotlib",      [r"matplotlib"]),
+    ("Seaborn",         [r"seaborn"]),
+    ("Plotly",          [r"plotly"]),
+    ("SciPy",           [r"scipy"]),
+    ("Statsmodels",     [r"statsmodels"]),
+    ("Jupyter",         [r"jupyter(?:\s+notebook|\s+lab)?"]),
+    
+    # ── R Ecosystem ───────────────────────────────────────────────────────
+    ("RStudio",         [r"rstudio"]),
+    ("ggplot2",         [r"ggplot2?"]),
+    ("tidyverse",       [r"tidyverse", r"\bdplyr\b", r"\btidyr\b"]),
+    ("Shiny",           [r"\bshiny\b(?:\s+app)?"]),
+    
+    # ── Marketing Analytics ───────────────────────────────────────────────
+    ("Google Analytics",[r"google\s+analytics", r"\bga4\b"]),
+    ("Adobe Analytics", [r"adobe\s+analytics", r"\bomniture\b"]),
+    ("Google Ads",      [r"google\s+ads", r"google\s+adwords"]),
+    ("Facebook Ads",    [r"facebook\s+ads", r"meta\s+ads"]),
+    ("SEO",             [r"\bseo\b", r"search\s+engine\s+optimization"]),
+    ("SEM",             [r"\bsem\b(?=\s+analyst|\s+specialist)", r"search\s+engine\s+marketing"]),
+    ("Web Analytics",   [r"web\s+analytics", r"digital\s+analytics"]),
+    ("Marketing Mix Modeling",[r"marketing\s+mix\s+model", r"\bmmm\b"]),
+    ("Attribution Modeling",[r"attribution\s+model", r"multi[\s\-]?touch\s+attribution"]),
+    ("Customer Segmentation",[r"customer\s+segmentation"]),
+    ("Salesforce",      [r"salesforce", r"\bsfdc\b"]),
+    ("HubSpot",         [r"hubspot"]),
+    ("Marketo",         [r"marketo"]),
+    ("Mailchimp",       [r"mailchimp"]),
+    ("CRM",             [r"\bcrm\b", r"customer\s+relationship\s+management"]),
+    
+    # ── Product Analytics ──────────────────────────────────────────────────
+    ("Mixpanel",        [r"mixpanel"]),
+    ("Amplitude",       [r"amplitude"]),
+    ("Pendo",           [r"\bpendo\b"]),
+    ("Heap",            [r"\bheap\b(?:\s+analytics)?"]),
+    ("FullStory",       [r"fullstory"]),
+    ("Hotjar",          [r"hotjar"]),
+    ("Segment",         [r"\bsegment\b(?:\s+cdp|\s+io)?"]),
+    ("Customer Data Platform",[r"\bcdp\b", r"customer\s+data\s+platform"]),
+    ("User Research",   [r"user\s+research", r"usability\s+test"]),
+    ("Retention Analysis",[r"retention\s+analysis", r"retention\s+rate"]),
+    ("DAU/MAU",         [r"\bdau\b", r"\bmau\b", r"\bwau\b"]),
+    ("OKRs",            [r"\bokrs?\b", r"objectives\s+and\s+key\s+results"]),
+    ("KPIs",            [r"\bkpis?\b", r"key\s+performance\s+indicator"]),
+    
+    # ── Financial Analytics ───────────────────────────────────────────────
+    ("Financial Modeling",[r"financial\s+model", r"\bdcf\b"]),
+    ("Financial Analysis",[r"financial\s+analysis"]),
+    ("Valuation",       [r"\bvaluation\b", r"equity\s+valuation"]),
+    ("FP&A",            [r"\bfp&a\b", r"financial\s+planning"]),
+    ("Variance Analysis",[r"variance\s+analysis", r"budget\s+vs"]),
+    ("P&L Management",  [r"p(?:rofit)?\s*(?:&|and)\s*l(?:oss)?", r"\bp&l\b"]),
+    ("SAP",             [r"\bsap\b"]),
+    ("Oracle Financials",[r"oracle\s+financials", r"oracle\s+erp"]),
+    ("ERP",             [r"\berp\b", r"enterprise\s+resource\s+planning"]),
+    ("QuickBooks",      [r"quickbooks"]),
+    ("NetSuite",        [r"netsuite"]),
+    ("Bloomberg",       [r"bloomberg"]),
+    ("FactSet",         [r"factset"]),
+    ("GAAP",            [r"\bgaap\b"]),
+    ("IFRS",            [r"\bifrs\b"]),
+    ("Risk Analysis",   [r"risk\s+analysis", r"risk\s+model"]),
+    
+    # ── Operations Analytics ───────────────────────────────────────────────
+    ("Process Improvement",[r"process\s+improvement"]),
+    ("Lean",            [r"\blean\b(?:\s+six\s+sigma)?"]),
+    ("Six Sigma",       [r"six\s+sigma", r"\bdmaic\b"]),
+    ("Supply Chain",    [r"supply\s+chain"]),
+    ("Inventory Management",[r"inventory\s+management"]),
+    ("Demand Planning", [r"demand\s+planning", r"demand\s+forecasting"]),
+    ("Workforce Analytics",[r"workforce\s+analytics", r"hr\s+analytics"]),
+    
+    # ── Soft Skills & Methodologies ───────────────────────────────────────
+    ("Agile",           [r"\bagile\b"]),
+    ("Scrum",           [r"\bscrum\b"]),
+    ("Data Storytelling",[r"data\s+storytelling", r"data\s+narrativ"]),
+    ("Problem Solving", [r"problem[\s\-]+solving"]),
+    ("Critical Thinking",[r"critical\s+thinking"]),
+    ("Requirements Gathering",[r"requirements?\s+gathering"]),
+    ("Stakeholder Management",[r"stakeholder\s+management"]),
+    ("Project Management",[r"project\s+management", r"\bpmp\b"]),
+    ("Jira",            [r"\bjira\b"]),
+    ("Confluence",      [r"confluence"]),
+    ("Data Governance", [r"data\s+governance", r"data\s+quality"]),
+    ("Git",             [r"\bgit\b"]),
+    ("GitHub",          [r"github"]),
+]
+
+# Compile all patterns (case-insensitive)
+_R_PATTERN = re.compile(r"(?<!\w)R(?!\w)")   # strict case-sensitive
+
+_SKILL_PATTERNS: list[tuple[str, re.Pattern]] = []
+for _canonical, _patterns in _SKILLS_RAW:
+    _combined = "|".join(f"(?:{p})" for p in _patterns)
+    _SKILL_PATTERNS.append((_canonical, re.compile(_combined, re.IGNORECASE)))
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# REMOTE STATUS EXTRACTION (weighted scoring model)
+# ──────────────────────────────────────────────────────────────────────────────
+
+_REMOTE_SIGNALS: list[tuple[re.Pattern, int]] = [
+    # Strong remote (+3)
+    (re.compile(
+        r"\b(?:fully?\s*remote|100\s*%\s*remote|remote[\s\-]*only|"
+        r"entirely\s*remote|permanently\s*remote|remote[\s\-]*first)\b", re.I), +3),
+    # Moderate remote (+2)
+    (re.compile(
+        r"\b(?:work(?:ing)?\s*(?:from|at)\s*home|wfh|telecommut(?:e|ing)|"
+        r"distributed\s*team|location[\s\-]*independent|work\s*anywhere|"
+        r"anywhere\s*in\s*(?:the\s*)?(?:us|usa|world)|no\s*office\s*required|"
+        r"remote\s*work\s*(?:allowed|available|option|eligible))\b", re.I), +2),
+    # General remote mention (+1)
+    (re.compile(r"\bremote\b", re.I), +1),
+    # Hybrid keyword (0, tracked separately)
+    (re.compile(
+        r"\b(?:hybrid|partial(?:ly)?\s*remote|remote[\s/\-]*hybrid|"
+        r"flexible\s*work(?:ing)?|mix(?:ed)?\s*(?:of\s*)?(?:remote|office|on[\s\-]?site))\b",
+        re.I), 0),
+    # "X days in office per week" → explicit hybrid
+    (re.compile(
+        r"\b\d+\s*(?:days?\s*(?:per\s*week\s*)?(?:in[\s\-]?office|on[\s\-]?site|in\s*person)|"
+        r"(?:in[\s\-]?office|on[\s\-]?site)\s*days?\s*per\s*week)\b", re.I), +2),
+    # On-site (-2)
+    (re.compile(
+        r"\b(?:in[\s\-]person|on[\s\-]?site)\b|"
+        r"\bin[\s\-]office\b(?!\s*day)(?!\s*\d)|"
+        r"\b(?:must\s+(?:be\s+)?(?:located|based|reside|live)\s+(?:in|near|within)|"
+        r"relocation\s+(?:required|assistance|package)|"
+        r"authorized\s+to\s+work\s+in)\b|"
+        r"(?:must\s+)?report\s+to\s+(?:(?:our|the)\s+)?\w+(?:[\s\-]\w+)?\s+office\b",
+        re.I), -2),
+    # Soft on-site (-1)
+    (re.compile(
+        r"\b(?:office[\s\-]based|our\s*(?:\w+\s+)*office|headquarters|hq|"
+        r"commut(?:e|ing)|badge\s*access|parking\s*(?:provided|available)|"
+        r"campus|building\s*access)\b", re.I), -1),
+    # Job-type on-site (-2)
+    (re.compile(
+        r"\b(?:on[\s\-]?call|shift\s*work|night\s*shift|day\s*shift|"
+        r"warehouse|field\s*(?:work|engineer|technician)|"
+        r"travel\s*(?:required|up\s*to\s*\d))\b", re.I), -2),
+]
+
+_RE_HYBRID_EXPLICIT = re.compile(
+    r"\b(?:hybrid|partial(?:ly)?\s*remote|flexible\s*work(?:ing)?)\b", re.I
+)
+
+# ────────────────────────────────────────────────────────────────────────────
+# EDUCATION KEYWORDS (PRESERVED)
+# ────────────────────────────────────────────────────────────────────────────
+
 EDUCATION_KEYWORDS = {
     "Bachelor's": r"\bbachelor['s]*\b|\bb\.?a\.?\b|\bb\.?s\.?\b|\bundergraduate\b",
     "Master's": r"\bmaster['s]*\b|\bm\.?s\.?\b|\bm\.?a\.?\b|\bmba\b",
     "PhD": r"\bph\.?d\b|\bdoctorate\b"
 }
-# State Mapping (Both abbreviations and full names)
-STATE_MAPPING = {
-    "AL": ["alabama", "al"],
-    "AK": ["alaska", "ak"],
-    "AZ": ["arizona", "az"],
-    "AR": ["arkansas", "ar"],
-    "CA": ["california", "ca"],
-    "CO": ["colorado", "co"],
-    "CT": ["connecticut", "ct"],
-    "DE": ["delaware", "de"],
-    "FL": ["florida", "fl"],
-    "GA": ["georgia", "ga"],
-    "HI": ["hawaii", "hi"],
-    "ID": ["idaho", "id"],
-    "IL": ["illinois", "il"],
-    "IN": ["indiana", "in"],
-    "IA": ["iowa", "ia"],
-    "KS": ["kansas", "ks"],
-    "KY": ["kentucky", "ky"],
-    "LA": ["louisiana", "la"],
-    "ME": ["maine", "me"],
-    "MD": ["maryland", "md"],
-    "MA": ["massachusetts", "mass", "ma"],
-    "MI": ["michigan", "mi"],
-    "MN": ["minnesota", "mn"],
-    "MS": ["mississippi", "ms"],
-    "MO": ["missouri", "mo"],
-    "MT": ["montana", "mt"],
-    "NE": ["nebraska", "ne"],
-    "NV": ["nevada", "nv"],
-    "NH": ["new hampshire", "nh"],
-    "NJ": ["new jersey", "nj"],
-    "NM": ["new mexico", "nm"],
-    "NY": ["new york", "ny"],
-    "NC": ["north carolina", "nc"],
-    "ND": ["north dakota", "nd"],
-    "OH": ["ohio", "oh"],
-    "OK": ["oklahoma", "ok"],
-    "OR": ["oregon", "or"],
-    "PA": ["pennsylvania", "penn", "pa"],
-    "RI": ["rhode island", "ri"],
-    "SC": ["south carolina", "sc"],
-    "SD": ["south dakota", "sd"],
-    "TN": ["tennessee", "tn"],
-    "TX": ["texas", "tx"],
-    "UT": ["utah", "ut"],
-    "VT": ["vermont", "vt"],
-    "VA": ["virginia", "va"],
-    "WA": ["washington", "wa"],
-    "WV": ["west virginia", "wv"],
-    "WI": ["wisconsin", "wi"],
-    "WY": ["wyoming", "wy"],
-    "DC": ["district of columbia", "washington dc", "dc"],
-}
-# Remote status keywords (aggressive matching)
-REMOTE_KEYWORDS = {
-    "Remote": r"\bremote\b|\bwork\s*from\s*home\b|\bwfh\b|\bfully\s*remote\b|\btelecommute\b|\bvirtual\b",
-    "Hybrid": r"\bhybrid\b|\bdays\s*on\s*site\b|\bflexible\b|\bmixed\b",
-    "On-site": r"\bon[\s-]*site\b|\bonsite\b|\bin\s*office\b|\bin[\s-]*person\b|\boffice\b"
-}
-# Comprehensive Benefits Dictionary (Aggressive Semantic Matching)
+
+# ────────────────────────────────────────────────────────────────────────────
+# BENEFITS MAPPING (PRESERVED)
+# ────────────────────────────────────────────────────────────────────────────
+
 BENEFITS_MAPPING = {
     "401(k)": [
         "401k", "401(k)", "401 k", "retirement", "401 (k)",
@@ -151,15 +504,6 @@ for benefit_name, phrases in BENEFITS_MAPPING.items():
     for phrase in phrases:
         BENEFITS_PATTERNS[phrase] = benefit_name
 
-# All US state abbreviations
-US_STATES = {
-    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC"
-}
-
 # Global counter for debugging
 JOBS_PROCESSED = 0
 
@@ -174,121 +518,24 @@ def load_environment() -> None:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
 
 
-def extract_city_state(location: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+def extract_skills(description: str) -> list[str]:
     """
-    Robust location extraction with comprehensive fallback chain:
-    1. spaCy NER for GPE entities
-    2. Full state names and abbreviations (both directions)
-    3. Remote/non-geographic handling (US/National defaults)
-    4. First word fallback for city
+    Return a sorted, deduplicated list of canonical skill names found in text.
+    NOTE: This is wrapped to return comma-separated string for BigQuery compatibility.
     """
-    if not location:
-        return None, None
-    
-    location = location.strip()
-    city = None
-    state = None
-    
-    # Check for remote/non-geographic locations
-    location_lower = location.lower()
-    if any(term in location_lower for term in ["remote", "anywhere", "virtual", "distributed", "online", "work from home", "wfh"]):
-        # For remote positions without specific state, try to extract if mentioned
-        # e.g., "Remote - Texas" or "Remote, CA"
-        pass  # Fall through to extraction below
-    
-    # If explicitly "United States" or "USA" without state, default to "US"
-    if re.search(r"\bunited\s*states\b|\busa\b|^us$", location_lower):
-        return "USA", "US"
-    
-    # Try spaCy NER first
-    if NLP:
-        try:
-            doc = NLP(location)
-            for ent in doc.ents:
-                if ent.label_ == "GPE":
-                    # Check if it's a state code
-                    if len(ent.text) == 2 and ent.text.upper() in US_STATES:
-                        state = ent.text.upper()
-                    else:
-                        if not city:
-                            city = ent.text
-        except Exception:
-            pass
-    
-    # Fallback: Comprehensive state matching (abbreviations and full names)
-    if not state:
-        location_normalized = location.lower()
-        # Split by common delimiters
-        parts = re.split(r"[,\-|]", location_normalized)
-        for part in parts:
-            part = part.strip()
-            # Check each state mapping
-            for state_code, names in STATE_MAPPING.items():
-                for name_variant in names:
-                    # Exact word match
-                    if re.search(rf"\b{re.escape(name_variant)}\b", part):
-                        state = state_code
-                        break
-                if state:
-                    break
-            if state:
-                break
-    
-    # Fallback: Extract first meaningful word as city
-    if not city:
-        # Remove state from location if we found it
-        location_for_city = location
-        if state:
-            # Try to remove the state from location string
-            for state_code, names in STATE_MAPPING.items():
-                if state_code == state:
-                    for name_variant in names:
-                        location_for_city = re.sub(rf"\b{re.escape(name_variant)}\b", "", location_for_city, flags=re.IGNORECASE)
-        
-        # Get first non-empty, non-delimiter part
-        parts = re.split(r"[,\-|]", location_for_city)
-        for part in parts:
-            part = part.strip()
-            if part and len(part) > 0 and not re.match(r"^\d+$", part):  # Skip numbers
-                city = part
-                break
-    
-    # If still no city but we have state, construct a default
-    if not city and state:
-        city = f"Multiple Cities, {state}"
-    
-    return city, state
+    if not description:
+        return []
 
+    found: set[str] = set()
 
-def extract_skills(text: Optional[str]) -> Optional[str]:
-    """
-    Bulletproof skills extraction with fuzzy matching and punctuation tolerance.
-    Handles variations like PowerBI, Power-BI, Node.js, Node JS, etc.
-    Exception: R uses strict word boundary matching.
-    """
-    if not text:
-        return None
-    
-    text_lower = text.lower()
-    # Normalize punctuation/spacing for matching (but preserve for strict R)
-    text_normalized = re.sub(r"[_\-\s.]+", " ", text_lower)
-    
-    found_skills = set()
-    
-    # Check R with strict word boundary (case-insensitive match but keep original case)
-    if re.search(r"\br\b", text_lower, re.IGNORECASE):
-        found_skills.add("R")
-    
-    # Check all other skills using fuzzy variant matching
-    for skill_name, variants in SKILLS_MAPPING.items():
-        for variant in variants:
-            # Create flexible pattern: handles punctuation and spacing
-            pattern = re.sub(r"[_\-\s.]+", r"[\\s._-]*", re.escape(variant))
-            if re.search(rf"\b{pattern}\b", text_normalized, re.IGNORECASE):
-                found_skills.add(skill_name)
-                break  # Found this skill, move to next
-    
-    return ", ".join(sorted(found_skills)) if found_skills else None
+    for canonical, pattern in _SKILL_PATTERNS:
+        if pattern.search(description):
+            found.add(canonical)
+
+    if _R_PATTERN.search(description):
+        found.add("R")
+
+    return sorted(found)
 
 
 def extract_education(text: Optional[str]) -> Optional[str]:
@@ -306,17 +553,38 @@ def extract_education(text: Optional[str]) -> Optional[str]:
     return None
 
 
-def extract_remote_status(description: Optional[str], location: Optional[str]) -> Optional[str]:
-    """Extract remote status from description and location fields. Returns 'Remote', 'Hybrid', 'On-site', or 'Not Specified'."""
-    combined_text = f"{description or ''} {location or ''}".lower()
-    
-    # Check in order: Remote, Hybrid, On-site
-    for status, pattern in REMOTE_KEYWORDS.items():
-        if re.search(pattern, combined_text, re.IGNORECASE):
-            return status
-    
-    # Default to "Not Specified" instead of None
-    return "Not Specified"
+def extract_remote_status(
+    title: str,
+    description: str,
+    location: str = "",
+) -> str:
+    """
+    Classify work arrangement using weighted scoring model.
+    Returns: "Remote" | "Hybrid" | "On-site" | "Not Specified"
+    """
+    corpus = f"{title} {title} {location} {description}"  # title weighted 2×
+    score        = 0
+    hybrid_found = False
+
+    for pattern, weight in _REMOTE_SIGNALS:
+        if pattern.search(corpus):
+            score += weight
+            if weight == 0:
+                hybrid_found = True
+
+    if _RE_HYBRID_EXPLICIT.search(corpus):
+        hybrid_found = True
+
+    if score >= 2:
+        return "Remote"
+    elif score <= -2:
+        return "On-site"
+    elif hybrid_found:
+        return "Hybrid"
+    elif score == 1:
+        return "Remote"
+    else:
+        return "Not Specified"
 
 
 def extract_benefits(text: Optional[str]) -> Optional[str]:
@@ -613,16 +881,21 @@ def build_row(
     elif not isinstance(location, str):
         location_str = None
 
-    # Extract city and state from location
-    city, state = extract_city_state(location_str)
-    
     # Clean description
     cleaned_description = strip_html(description)
     
+    # Extract state from location (Claude's extract_state only returns state, not city)
+    state = extract_state(location_str or "", cleaned_description or "")
+    city = None  # BUG FIX #2: Claude's extract_state doesn't return city, so set to None
+    
     # Extract skills, education, remote status, benefits
-    skills = extract_skills(cleaned_description)
+    # BUG FIX #1: extract_skills returns list[str], convert to comma-separated string for BigQuery
+    skills_list = extract_skills(cleaned_description)
+    skills = ", ".join(skills_list) if skills_list else None
+    
     education = extract_education(cleaned_description)
-    remote_status = extract_remote_status(cleaned_description, location_str)
+    # BUG FIX: extract_remote_status now takes (title, description, location) as positional args
+    remote_status = extract_remote_status(job_title or "", cleaned_description or "", location_str or "")
     benefits = extract_benefits(cleaned_description)
     
     # Parse salary
