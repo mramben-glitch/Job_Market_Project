@@ -35,12 +35,7 @@ ROLES = [
     "Data Scientist",
 ]
 
-# Initialize spaCy model globally
-try:
-    NLP = spacy.load("en_core_web_sm")
-except OSError:
-    print("[spaCy] Model not found. Install with: python -m spacy download en_core_web_sm")
-    NLP = None
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SHARED HELPERS FOR GEO & EXTRACTION
