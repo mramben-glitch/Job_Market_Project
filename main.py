@@ -476,17 +476,31 @@ def load_environment() -> None:
 
 
 def extract_remote_status(
-    title: str,
+    location: str,
     description: str,
-    location: str = "",
+    title: str = "",
 ) -> str:
     """
     Classify work arrangement using weighted scoring model.
     Returns: "Remote" | "Hybrid" | "On-site" | "Not Specified"
+    
+    Scoring:
+    - Title contains 'remote': +5 (heavily weighted)
+    - Score >= 2: Remote
+    - Score <= -2: On-site
+    - Hybrid keyword found: Hybrid
+    - Score == 1: Remote
+    - Otherwise: Not Specified
     """
-    corpus = f"{title} {title} {location} {description}"  # title weighted 2×
     score        = 0
     hybrid_found = False
+    
+    # Check if 'remote' appears in title (heavily weighted)
+    if re.search(r"\bremote\b", title, re.IGNORECASE):
+        score += 5
+    
+    # Build corpus for pattern matching (location and description)
+    corpus = f"{location} {description}"
 
     for pattern, weight in _REMOTE_SIGNALS:
         if pattern.search(corpus):
@@ -786,11 +800,15 @@ def build_row(
     state = extract_state(location_str or "", cleaned_description or "")
     city = None  # BUG FIX #2: Claude's extract_state doesn't return city, so set to None
     
+    # US-ONLY FILTER: Drop non-US jobs
+    if not state or state == "N/A":
+        return None
+    
     # Extract skills, education, remote status, benefits (from extractors module)
     skills = extract_skills(cleaned_description)
     education = extract_education(cleaned_description)
-    # BUG FIX: extract_remote_status now takes (title, description, location) as positional args
-    remote_status = extract_remote_status(job_title or "", cleaned_description or "", location_str or "")
+    # Updated signature: extract_remote_status(location, description, title)
+    remote_status = extract_remote_status(location_str or "", cleaned_description or "", job_title or "")
     benefits = extract_benefits(cleaned_description)
     
     # Extract industry and soft skills (NEW in Phase 3)
