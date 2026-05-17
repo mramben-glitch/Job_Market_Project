@@ -10,12 +10,14 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 import geonamescache
 import pandas as pd
 import requests
-import spacy
+
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 from dotenv import load_dotenv
 from google.cloud import bigquery
 from google.oauth2 import service_account
+
+from extractors import extract_industry, extract_education, extract_benefits, extract_skills, extract_soft_skills
 
 PROJECT_ID = "my-first-project-27273"
 DATASET = "data_job_market"
@@ -459,50 +461,7 @@ _RE_HYBRID_EXPLICIT = re.compile(
     r"\b(?:hybrid|partial(?:ly)?\s*remote|flexible\s*work(?:ing)?)\b", re.I
 )
 
-# ────────────────────────────────────────────────────────────────────────────
-# EDUCATION KEYWORDS (PRESERVED)
-# ────────────────────────────────────────────────────────────────────────────
 
-EDUCATION_KEYWORDS = {
-    "Bachelor's": r"\bbachelor['s]*\b|\bb\.?a\.?\b|\bb\.?s\.?\b|\bundergraduate\b",
-    "Master's": r"\bmaster['s]*\b|\bm\.?s\.?\b|\bm\.?a\.?\b|\bmba\b",
-    "PhD": r"\bph\.?d\b|\bdoctorate\b"
-}
-
-# ────────────────────────────────────────────────────────────────────────────
-# BENEFITS MAPPING (PRESERVED)
-# ────────────────────────────────────────────────────────────────────────────
-
-BENEFITS_MAPPING = {
-    "401(k)": [
-        "401k", "401(k)", "401 k", "retirement", "401 (k)",
-        "retirement plan", "retirement savings", "roth", "matching"
-    ],
-    "Health Insurance": [
-        "health", "health insurance", "medical", "healthcare", "health coverage",
-        "dental", "vision", "health plan", "comprehensive health", "medical plan",
-        "health benefits", "dental coverage", "vision coverage", "eye care"
-    ],
-    "PTO": [
-        "pto", "paid time off", "vacation", "paid leave", "paid vacation",
-        "time off", "holiday", "holidays", "paid holiday", "personal days",
-        "days off", "leave", "annual leave", "sick leave", "paid sick"
-    ],
-    "Bonus": [
-        "bonus", "signing bonus", "sign on bonus", "performance bonus",
-        "annual bonus", "incentive", "bounty", "reward"
-    ],
-    "Stock": [
-        "stock", "stock option", "stock options", "equity", "rsu",
-        "restricted stock", "profit sharing", "shares"
-    ],
-}
-
-# Create reverse lookup for benefits (for faster matching)
-BENEFITS_PATTERNS = {}
-for benefit_name, phrases in BENEFITS_MAPPING.items():
-    for phrase in phrases:
-        BENEFITS_PATTERNS[phrase] = benefit_name
 
 # Global counter for debugging
 JOBS_PROCESSED = 0
@@ -518,39 +477,7 @@ def load_environment() -> None:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
 
 
-def extract_skills(description: str) -> list[str]:
-    """
-    Return a sorted, deduplicated list of canonical skill names found in text.
-    NOTE: This is wrapped to return comma-separated string for BigQuery compatibility.
-    """
-    if not description:
-        return []
 
-    found: set[str] = set()
-
-    for canonical, pattern in _SKILL_PATTERNS:
-        if pattern.search(description):
-            found.add(canonical)
-
-    if _R_PATTERN.search(description):
-        found.add("R")
-
-    return sorted(found)
-
-
-def extract_education(text: Optional[str]) -> Optional[str]:
-    """Extract education requirements from job description."""
-    if not text:
-        return None
-    
-    text_lower = text.lower()
-    
-    # Check in order: PhD, Master's, Bachelor's
-    for edu, pattern in EDUCATION_KEYWORDS.items():
-        if re.search(pattern, text_lower, re.IGNORECASE):
-            return edu
-    
-    return None
 
 
 def extract_remote_status(
@@ -587,31 +514,7 @@ def extract_remote_status(
         return "Not Specified"
 
 
-def extract_benefits(text: Optional[str]) -> Optional[str]:
-    """
-    Aggressive semantic benefits matching using comprehensive phrase library.
-    Handles dozens of variations for each benefit category.
-    Returns comma-separated benefits or None if none found.
-    """
-    if not text:
-        return None
-    
-    text_lower = text.lower()
-    # Normalize punctuation and spacing
-    text_normalized = re.sub(r"[_\-\s.]+", " ", text_lower)
-    
-    found_benefits = set()
-    
-    # Check each benefit against its comprehensive phrase list
-    for benefit_name, phrases in BENEFITS_MAPPING.items():
-        for phrase in phrases:
-            # Create flexible pattern for punctuation/spacing
-            pattern = re.sub(r"[_\-\s.]+", r"[\\s._-]*", re.escape(phrase))
-            if re.search(rf"\b{pattern}\b", text_normalized, re.IGNORECASE):
-                found_benefits.add(benefit_name)
-                break  # Found this benefit, move to next
-    
-    return ", ".join(sorted(found_benefits)) if found_benefits else None
+
 
 
 def parse_salary_range(salary_raw: Any) -> Tuple[Optional[float], Optional[float]]:
@@ -867,7 +770,7 @@ def build_row(
     date_posted: Any = None,
     api_dict: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
-    """Build a standardized job row for BigQuery with all 15 columns. Return None if filtered out."""
+    """Build a standardized job row for BigQuery with all 17 columns. Return None if filtered out."""
     global JOBS_PROCESSED
     
     if not strict_inclusion_filter(job_title):
@@ -888,15 +791,17 @@ def build_row(
     state = extract_state(location_str or "", cleaned_description or "")
     city = None  # BUG FIX #2: Claude's extract_state doesn't return city, so set to None
     
-    # Extract skills, education, remote status, benefits
-    # BUG FIX #1: extract_skills returns list[str], convert to comma-separated string for BigQuery
-    skills_list = extract_skills(cleaned_description)
-    skills = ", ".join(skills_list) if skills_list else None
-    
+    # Extract skills, education, remote status, benefits (from extractors module)
+    skills = extract_skills(cleaned_description)
     education = extract_education(cleaned_description)
     # BUG FIX: extract_remote_status now takes (title, description, location) as positional args
     remote_status = extract_remote_status(job_title or "", cleaned_description or "", location_str or "")
     benefits = extract_benefits(cleaned_description)
+    
+    # Extract industry and soft skills (NEW in Phase 3)
+    company_name = safe_company_name(company)
+    industry = extract_industry(company_name, cleaned_description or "")
+    soft_skills = extract_soft_skills(cleaned_description)
     
     # Parse salary
     salary_min, salary_max = parse_salary_range(salary_raw)
@@ -909,11 +814,12 @@ def build_row(
 
     # Debugging: print every 10th job
     if JOBS_PROCESSED % 10 == 0:
-        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status} | Skills: {skills or 'N/A'}")
+        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status} | Industry: {industry or 'N/A'} | Skills: {skills or 'N/A'}")
 
     return {
         "job_title": job_title,
-        "company": safe_company_name(company),
+        "company": company_name,
+        "industry": industry,
         "location": location_str,
         "city": city,
         "state": state,
@@ -922,6 +828,7 @@ def build_row(
         "salary_max": salary_max,
         "job_url": job_url,
         "skills": skills,
+        "soft_skills": soft_skills,
         "education": education,
         "remote_status": remote_status,
         "benefits": benefits,
@@ -1270,10 +1177,11 @@ def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
 
 def ensure_table_exists(client: bigquery.Client) -> None:
-    """Create BigQuery table with the 15-column Smart ETL schema if it does not exist."""
+    """Create BigQuery table with the 17-column Smart ETL schema if it does not exist."""
     schema = [
         bigquery.SchemaField("job_title", "STRING"),
         bigquery.SchemaField("company", "STRING"),
+        bigquery.SchemaField("industry", "STRING"),
         bigquery.SchemaField("location", "STRING"),
         bigquery.SchemaField("city", "STRING"),
         bigquery.SchemaField("state", "STRING"),
@@ -1282,6 +1190,7 @@ def ensure_table_exists(client: bigquery.Client) -> None:
         bigquery.SchemaField("salary_max", "FLOAT64"),
         bigquery.SchemaField("job_url", "STRING"),
         bigquery.SchemaField("skills", "STRING"),
+        bigquery.SchemaField("soft_skills", "STRING"),
         bigquery.SchemaField("education", "STRING"),
         bigquery.SchemaField("remote_status", "STRING"),
         bigquery.SchemaField("benefits", "STRING"),
@@ -1290,11 +1199,11 @@ def ensure_table_exists(client: bigquery.Client) -> None:
     ]
     table = bigquery.Table(TABLE_ID, schema=schema)
     client.create_table(table, exists_ok=True)
-    print(f"[BigQuery] Table {TABLE_ID} ensured with Smart ETL schema (15 columns).")
+    print(f"[BigQuery] Table {TABLE_ID} ensured with Smart ETL schema (17 columns).")
 
 
 def load_rows_to_bigquery(rows: List[Dict[str, Any]], client: bigquery.Client) -> None:
-    """Load job rows into BigQuery with the 15-column Smart ETL schema."""
+    """Load job rows into BigQuery with the 17-column Smart ETL schema."""
     if not rows:
         print("[BigQuery] No new rows to load.")
         return
@@ -1304,6 +1213,7 @@ def load_rows_to_bigquery(rows: List[Dict[str, Any]], client: bigquery.Client) -
             schema=[
                 bigquery.SchemaField("job_title", "STRING"),
                 bigquery.SchemaField("company", "STRING"),
+                bigquery.SchemaField("industry", "STRING"),
                 bigquery.SchemaField("location", "STRING"),
                 bigquery.SchemaField("city", "STRING"),
                 bigquery.SchemaField("state", "STRING"),
@@ -1312,6 +1222,7 @@ def load_rows_to_bigquery(rows: List[Dict[str, Any]], client: bigquery.Client) -
                 bigquery.SchemaField("salary_max", "FLOAT64"),
                 bigquery.SchemaField("job_url", "STRING"),
                 bigquery.SchemaField("skills", "STRING"),
+                bigquery.SchemaField("soft_skills", "STRING"),
                 bigquery.SchemaField("education", "STRING"),
                 bigquery.SchemaField("remote_status", "STRING"),
                 bigquery.SchemaField("benefits", "STRING"),
@@ -1344,12 +1255,15 @@ def main() -> None:
     print("\nSmart ETL Features:")
     print("  • Salary parsing: min/max extraction with k-suffix & hourly conversion")
     print("  • Location parsing: city/state extraction with state code fallback")
-    print("  • Skills detection: R, Python, SQL, Excel, Power BI, Tableau, AWS, Azure, Spark, Snowflake, Looker")
+    print("  • Skills detection: 140+ hard skills (R, Python, SQL, Excel, Power BI, Tableau, AWS, Azure, Spark, Snowflake, Looker, etc.)")
+    print("  • Soft skills detection: 17 soft-skill categories (Communication, Leadership, Collaboration, Problem Solving, etc.)")
+    print("  • Industry classification: 40+ industry mappings with keyword fallback")
     print("  • Education detection: Bachelor's, Master's, PhD")
     print("  • Remote status detection: Remote, Hybrid, On-site, Not Specified")
-    print("  • Benefits detection: 401(k), Health Insurance, PTO, Bonus, Stock")
+    print("  • Benefits detection: 401(k), Health Insurance, PTO, Bonus, Stock/Equity, Remote/Flexible, Learning & Dev, Commuter")
     print("  • Date parsing: 'today', 'yesterday', '3 days ago', '30+' → YYYY-MM-DD")
     print("  • Debugging: Sample debug output every 10 jobs")
+    print("  • BigQuery schema: 17 columns (expanded from 15 with industry + soft_skills)")
     print()
 
     existing_urls = get_existing_urls(client)
