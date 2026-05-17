@@ -860,6 +860,8 @@ def fetch_adzuna(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                     "app_key": app_key,
                     "results_per_page": 100,
                     "what": role,
+                    "full_description": 1,
+                    "content-type": "full",
                 },
                 timeout=30,
             )
@@ -915,7 +917,7 @@ def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
         rows = []
         for page in range(1, 11):
             response = requests.post(
-                f"https://jooble.org/api/{api_key}",
+                f"https://jooble.org/api/{api_key}?full_description=true",
                 json={
                     "keywords": role,
                     "location": "United States",
@@ -998,17 +1000,34 @@ def fetch_usajobs(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
                 job_url = descriptor.get("PositionURI")
                 if job_url and job_url not in existing_urls:
+                    # Deep parse USAJobs UserArea.Details for comprehensive description
+                    details = descriptor.get("UserArea", {}).get("Details", {})
+                    description_parts = []
+                    if details.get("JobSummary"):
+                        description_parts.append(f"Job Summary:\n{details.get('JobSummary')}")
+                    if details.get("MajorDuties"):
+                        # MajorDuties may be a list
+                        duties = details.get("MajorDuties")
+                        if isinstance(duties, list):
+                            description_parts.append(f"Major Duties:\n" + "\n".join(duties))
+                        else:
+                            description_parts.append(f"Major Duties:\n{duties}")
+                    if details.get("Education"):
+                        description_parts.append(f"Education:\n{details.get('Education')}")
+                    if details.get("Requirements"):
+                        description_parts.append(f"Requirements:\n{details.get('Requirements')}")
+                    
+                    # Concatenate all parts or fallback
+                    full_description = "\n\n".join(description_parts) if description_parts else (
+                        descriptor.get("QualificationSummary")
+                        or descriptor.get("PositionSummary")
+                    )
+                    
                     row = build_row(
                         job_title=descriptor.get("PositionTitle"),
                         company=descriptor.get("OrganizationName"),
                         location=", ".join(location_values) if location_values else None,
-                        description=(
-                            descriptor.get("UserArea", {})
-                            .get("Details", {})
-                            .get("JobSummary")
-                            or descriptor.get("QualificationSummary")
-                            or descriptor.get("PositionSummary")
-                        ),
+                        description=full_description,
                         salary_raw=descriptor.get("PositionRemuneration"),
                         job_url=job_url,
                         date_posted=descriptor.get("PublicationStartDate"),
@@ -1037,6 +1056,7 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                 params={
                     "page": page,
                     "search_query": role,
+                    "full_description": "true",
                 },
                 timeout=30,
             )
