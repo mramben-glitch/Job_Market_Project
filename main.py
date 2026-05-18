@@ -36,10 +36,84 @@ ROLES = [
 ]
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# US STATE & COUNTRY CONSTANTS (for post-fetch filtering)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_US_STATE_ABBRS: frozenset[str] = frozenset({
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+    "DC", "PR", "GU", "VI", "AS", "MP",   # territories
+})
+
+_INTL_COUNTRY_TOKENS: frozenset[str] = frozenset({
+    "germany", "deutschland", "brazil", "brasil", "canada", "uk",
+    "united kingdom", "england", "france", "australia", "india",
+    "netherlands", "spain", "mexico", "singapore", "japan", "china",
+    "poland", "sweden", "norway", "denmark", "finland", "switzerland",
+    "austria", "belgium", "ireland", "italy", "portugal", "romania",
+    "czechia", "hungary", "colombia", "argentina", "chile", "peru",
+    "south africa", "nigeria", "kenya", "egypt", "israel", "uae",
+    "dubai", "hong kong", "new zealand", "philippines", "indonesia",
+    "malaysia", "thailand", "vietnam", "taiwan", "south korea",
+    "ukraine", "russia", "turkey", "pakistan", "bangladesh",
+})
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # SHARED HELPERS FOR GEO & EXTRACTION
 # ──────────────────────────────────────────────────────────────────────────────
+
+def _is_us_location(location_str: Optional[str]) -> bool:
+    """
+    Return True if location_str is consistent with a US job posting.
+
+    Logic (first match wins):
+      1. If the string contains a known non-US country name → False
+      2. If the string contains a US state abbreviation token → True
+      3. If the string contains US-specific strings → True
+      4. If the string is None / empty / "remote" / "worldwide" → True
+      5. Default → True  (benefit of the doubt)
+    """
+    if not location_str:
+        return True  # missing location ≠ international
+
+    loc_lower = location_str.lower().strip()
+
+    # ── 1. Known international country names ────────────────────────────────
+    for country in _INTL_COUNTRY_TOKENS:
+        if country in loc_lower:
+            return False
+
+    # ── 2. US state abbreviation token ──────────────────────────────────────
+    for token in re.split(r"[,/|;\s\-–—]+", location_str):
+        if token.strip().upper() in _US_STATE_ABBRS:
+            return True
+
+    # ── 3. US-specific strings ───────────────────────────────────────────────
+    us_signals = (
+        "united states", " usa", " us ", "(us)", "(usa)",
+        "u.s.a", "u.s.", "america",
+    )
+    for sig in us_signals:
+        if sig in loc_lower:
+            return True
+
+    # ── 4. Remote / worldwide / empty ────────────────────────────────────────
+    remote_signals = (
+        "remote", "worldwide", "anywhere", "work from home",
+        "wfh", "distributed", "global",
+    )
+    for sig in remote_signals:
+        if sig in loc_lower:
+            return True
+
+    # ── 5. Default: pass through ──────────────────────────────────────────────
+    return True
+
 
 def _normalize(text: str) -> str:
     """Lowercase, strip accents, collapse whitespace."""
@@ -475,22 +549,210 @@ def load_environment() -> None:
 
 
 
+def _extract_api_remote_flag(api_dict: Optional[Dict[str, Any]]) -> Optional[bool]:
+    """
+    Extract a structured remote/telework signal from any API's raw JSON dict.
+
+    Returns:
+        True   – API explicitly indicates fully remote or telework eligible
+        False  – API explicitly indicates NOT remote / on-site required
+        None   – API has no structured remote metadata (fall through to regex)
+    """
+    if not api_dict or not isinstance(api_dict, dict):
+        return None
+
+    # ── Arbeitnow: "remote" boolean ──────────────────────────────────────────
+    if "remote" in api_dict:
+        val = api_dict["remote"]
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.lower() in ("true", "yes", "1")
+
+    # ── Remotive: injected by fetcher as _remote_confirmed=True ─────────────
+    if api_dict.get("_remote_confirmed") is True:
+        return True
+
+    # ── USAJobs: TeleworkEligible in UserArea.Details ────────────────────────
+    user_area_details = api_dict.get("UserArea", {}).get("Details", {})
+    if user_area_details:
+        telework = user_area_details.get("TeleworkEligible", "")
+        if isinstance(telework, str) and telework.strip():
+            tl = telework.strip().lower()
+            if tl in ("yes", "true", "1", "situational telework",
+                      "regular telework", "ad-hoc telework"):
+                return True
+            if tl in ("no", "false", "0", "not applicable", "not eligible"):
+                return False
+
+        remote_ind = user_area_details.get("RemoteIndicator", "")
+        if isinstance(remote_ind, str) and remote_ind.strip():
+            ri = remote_ind.strip().lower()
+            if ri in ("yes", "true", "1"):
+                return True
+            if ri in ("no", "false", "0"):
+                return False
+
+    # ── The Muse: locations array containing "Remote" ─────────────────────────
+    locations = api_dict.get("locations", [])
+    if isinstance(locations, list) and locations:
+        location_names = [
+            str(loc.get("name", "")).lower()
+            for loc in locations
+            if isinstance(loc, dict)
+        ]
+        has_remote_location = any(
+            "remote" in n or "flexible" in n or "anywhere" in n
+            for n in location_names
+        )
+        has_physical_location = any(
+            not ("remote" in n or "flexible" in n or "anywhere" in n)
+            and n.strip() not in ("", "us", "usa", "united states")
+            for n in location_names
+        )
+        if has_remote_location and not has_physical_location:
+            return True
+        if has_remote_location and has_physical_location:
+            return None
+
+    return None
+
+
+def _extract_api_tags(api_dict: Optional[Dict[str, Any]]) -> List[str]:
+    """
+    Extract free-text skill/category tags from any API's raw JSON dict.
+    Returns a list of raw tag strings (lowercased, deduplicated).
+    """
+    if not api_dict or not isinstance(api_dict, dict):
+        return []
+
+    raw: list[str] = []
+
+    # ── The Muse: tags[].name ─────────────────────────────────────────────────
+    tags_list = api_dict.get("tags", [])
+    if isinstance(tags_list, list):
+        for tag in tags_list:
+            if isinstance(tag, dict):
+                name = tag.get("name") or tag.get("value") or ""
+                if name:
+                    raw.append(str(name).strip())
+            elif isinstance(tag, str) and tag.strip():
+                raw.append(tag.strip())
+
+    # ── USAJobs: JobCategory[].Name ───────────────────────────────────────────
+    for cat in api_dict.get("JobCategory", []):
+        if isinstance(cat, dict):
+            name = cat.get("Name", "")
+            if name:
+                raw.append(str(name).strip())
+
+    # ── USAJobs: UserArea.Details.MajorDuties (list of strings) ──────────────
+    major_duties = api_dict.get("UserArea", {}).get("Details", {}).get("MajorDuties", [])
+    if isinstance(major_duties, list):
+        for duty in major_duties:
+            if isinstance(duty, str) and duty.strip():
+                raw.append(duty.strip())
+
+    # ── Deduplicate (preserve insertion order, lowercase for comparison) ──────
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in raw:
+        key = item.lower()
+        if key not in seen:
+            seen.add(key)
+            result.append(item)
+
+    return result
+
+
+def _merge_remote_status(api_flag: Optional[bool], regex_result: str) -> str:
+    """
+    Combine a structured API remote flag with a regex-derived remote status.
+    Returns the merged result using truth table logic.
+    """
+    if api_flag is None:
+        return regex_result
+
+    if api_flag is True:
+        if regex_result == "Remote":
+            return "Remote"
+        if regex_result == "Hybrid":
+            return "Hybrid"
+        if regex_result == "On-site":
+            return "Hybrid"
+        return "Remote"
+
+    # api_flag is False
+    if regex_result == "Remote":
+        return "Hybrid"
+    if regex_result in ("Hybrid", "On-site"):
+        return regex_result
+    return "On-site"
+
+
+def _merge_skill_tokens(regex_csv: Optional[str], api_tags: List[str]) -> Optional[str]:
+    """
+    Merge a comma-separated regex result with a list of raw API tag strings.
+    Returns a sorted, comma-separated string or None.
+    """
+    regex_set: set[str] = set()
+    if regex_csv:
+        for item in regex_csv.split(","):
+            item = item.strip()
+            if item:
+                regex_set.add(item)
+
+    api_set: set[str] = set()
+    if api_tags:
+        tags_blob = " ".join(api_tags)
+        api_csv = extract_skills(tags_blob)
+        if api_csv:
+            for item in api_csv.split(","):
+                item = item.strip()
+                if item:
+                    api_set.add(item)
+
+    merged = regex_set | api_set
+    return ", ".join(sorted(merged)) if merged else None
+
+
+def _merge_benefits_tokens(regex_csv: Optional[str], api_tags: List[str]) -> Optional[str]:
+    """
+    Merge regex-derived benefits with any benefit phrases found in API tags.
+    Same strategy as _merge_skill_tokens but uses extract_benefits().
+    """
+    regex_set: set[str] = set()
+    if regex_csv:
+        for item in regex_csv.split(","):
+            item = item.strip()
+            if item:
+                regex_set.add(item)
+
+    api_set: set[str] = set()
+    if api_tags:
+        tags_blob = " ".join(api_tags)
+        api_csv = extract_benefits(tags_blob)
+        if api_csv:
+            for item in api_csv.split(","):
+                item = item.strip()
+                if item:
+                    api_set.add(item)
+
+    merged = regex_set | api_set
+    return ", ".join(sorted(merged)) if merged else None
+
+
 def extract_remote_status(
     location: str,
     description: str,
     title: str = "",
 ) -> str:
     """
-    Classify work arrangement using weighted scoring model.
+    Classify work arrangement using weighted scoring model (regex only).
     Returns: "Remote" | "Hybrid" | "On-site" | "Not Specified"
     
-    Scoring:
-    - Title contains 'remote': +5 (heavily weighted)
-    - Score >= 2: Remote
-    - Score <= -2: On-site
-    - Hybrid keyword found: Hybrid
-    - Score == 1: Remote
-    - Otherwise: Not Specified
+    Note: This is the regex-only scorer. For merged results with API metadata,
+    use _merge_remote_status(api_flag, extract_remote_status(...)).
     """
     score        = 0
     hybrid_found = False
@@ -770,83 +1032,113 @@ def safe_date_posted(date_value: Any) -> Optional[str]:
 
 
 def build_row(
-    job_title: Optional[str],
-    company: Any,
-    location: Any,
-    description: Optional[str],
-    salary_raw: Any,
-    job_url: Optional[str],
-    date_posted: Any = None,
-    api_dict: Optional[Dict[str, Any]] = None,
-) -> Optional[Dict[str, Any]]:
-    """Build a standardized job row for BigQuery with all 17 columns. Return None if filtered out."""
-    global JOBS_PROCESSED
+    job_title,
+    company,
+    location,
+    description,
+    salary_raw,
+    job_url,
+    date_posted=None,
+    api_dict=None,
+):
+    """
+    Build a standardized job row for BigQuery (17 columns).
+    Returns None if the job is filtered out.
     
+    Changes vs. original:
+        • Calls _is_us_location() as a post-fetch US guard
+        • Calls _extract_api_remote_flag() + _merge_remote_status()
+        • Calls _extract_api_tags() + _merge_skill_tokens() / _merge_benefits_tokens()
+        • Uses the updated extract_state() that handles multi-location strings
+    """
+    global JOBS_PROCESSED
+
+    # ── Role inclusion filter ─────────────────────────────────────────────────
     if not strict_inclusion_filter(job_title):
         return None
 
-    JOBS_PROCESSED += 1
-
+    # ── Location normalisation ────────────────────────────────────────────────
     location_str = location
     if isinstance(location, dict):
         location_str = location.get("display_name") or location.get("name")
     elif not isinstance(location, str):
         location_str = None
 
-    # Clean description
-    cleaned_description = strip_html(description)
-    
-    # Extract state from location (Claude's extract_state only returns state, not city)
-    state = extract_state(location_str or "", cleaned_description or "")
-    city = None  # BUG FIX #2: Claude's extract_state doesn't return city, so set to None
-    
-    # US-ONLY FILTER: Drop non-US jobs
-    if not state or state == "N/A":
+    # ── POST-FETCH US GUARD ───────────────────────────────────────────────────
+    # Reject jobs whose location string clearly references a non-US country.
+    if not _is_us_location(location_str):
         return None
-    
-    # Extract skills, education, remote status, benefits (from extractors module)
-    skills = extract_skills(cleaned_description)
-    education = extract_education(cleaned_description)
-    # Updated signature: extract_remote_status(location, description, title)
-    remote_status = extract_remote_status(location_str or "", cleaned_description or "", job_title or "")
-    benefits = extract_benefits(cleaned_description)
-    
-    # Extract industry and soft skills (NEW in Phase 3)
-    company_name = safe_company_name(company)
-    industry = extract_industry(company_name, cleaned_description or "")
+
+    JOBS_PROCESSED += 1
+
+    # ── Description cleaning ──────────────────────────────────────────────────
+    cleaned_description = strip_html(description)
+
+    # ── Geography ─────────────────────────────────────────────────────────────
+    # extract_state now handles multi-location strings
+    state = extract_state(location_str or "", cleaned_description or "")
+
+    # ── Structured metadata from API ──────────────────────────────────────────
+    api_remote_flag = _extract_api_remote_flag(api_dict)
+    api_tags        = _extract_api_tags(api_dict)
+
+    # ── Regex extraction ──────────────────────────────────────────────────────
+    regex_skills   = extract_skills(cleaned_description)
+    regex_benefits = extract_benefits(cleaned_description)
+    regex_remote   = extract_remote_status(
+        location_str or "", cleaned_description or "", job_title or ""
+    )
+
+    # ── MERGE ─────────────────────────────────────────────────────────────────
+    # Remote: structured flag + regex truth table
+    remote_status = _merge_remote_status(api_remote_flag, regex_remote)
+
+    # Skills: union of regex hits and canonicalized API tags
+    skills = _merge_skill_tokens(regex_skills, api_tags)
+
+    # Benefits: union of regex hits and any benefit phrases in API tags
+    benefits = _merge_benefits_tokens(regex_benefits, api_tags)
+
+    # ── Remaining extractions ─────────────────────────────────────────────────
+    education   = extract_education(cleaned_description)
+    industry    = extract_industry(safe_company_name(company), cleaned_description or "")
     soft_skills = extract_soft_skills(cleaned_description)
-    
-    # Parse salary
+
+    # ── Salary ───────────────────────────────────────────────────────────────
     salary_min, salary_max = parse_salary_range(salary_raw)
-    
-    # Get today's date for fallback
-    today_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    
-    # Parse date_posted with ironclad fallback to today's date
+
+    # ── Dates ─────────────────────────────────────────────────────────────────
+    today_date    = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     date_posted_str = parse_relative_date(date_posted, api_dict, today_date)
 
-    # Debugging: print every 10th job
+    # ── Debug ─────────────────────────────────────────────────────────────────
     if JOBS_PROCESSED % 10 == 0:
-        print(f"[DEBUG] Job #{JOBS_PROCESSED}: ${salary_min or 'N/A'} - ${salary_max or 'N/A'} | State: {state or 'N/A'} | Remote: {remote_status} | Industry: {industry or 'N/A'} | Skills: {skills or 'N/A'}")
+        print(
+            f"[DEBUG] Job #{JOBS_PROCESSED}: "
+            f"${salary_min or 'N/A'} - ${salary_max or 'N/A'} | "
+            f"State: {state or 'N/A'} | "
+            f"Remote: {remote_status} (api={api_remote_flag}, regex={regex_remote}) | "
+            f"Skills: {(skills or 'N/A')[:60]}"
+        )
 
     return {
-        "job_title": job_title,
-        "company": company_name,
-        "industry": industry,
-        "location": location_str,
-        "city": city,
-        "state": state,
-        "description": cleaned_description,
-        "salary_min": salary_min,
-        "salary_max": salary_max,
-        "job_url": job_url,
-        "skills": skills,
-        "soft_skills": soft_skills,
-        "education": education,
-        "remote_status": remote_status,
-        "benefits": benefits,
+        "job_title":      job_title,
+        "company":        safe_company_name(company),
+        "industry":       industry,
+        "location":       location_str,
+        "city":           None,
+        "state":          state,
+        "description":    cleaned_description,
+        "salary_min":     salary_min,
+        "salary_max":     salary_max,
+        "job_url":        job_url,
+        "skills":         skills,
+        "soft_skills":    soft_skills,
+        "education":      education,
+        "remote_status":  remote_status,
+        "benefits":       benefits,
         "date_retrieved": get_date_retrieved(),
-        "date_posted": date_posted_str,  # GUARANTEED non-null YYYY-MM-DD
+        "date_posted":    date_posted_str,
     }
 
 
@@ -926,7 +1218,15 @@ def fetch_adzuna(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
 
 def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
-    """Fetch jobs from Jooble API for a specific role with pagination."""
+    """
+    Fetch jobs from Jooble API for a specific role with pagination.
+    
+    US filter  : "location": "United States" already in payload.
+                 Additionally, build_row calls _is_us_location() to catch
+                 any international jobs Jooble slips through anyway.
+    Tags       : Jooble standard response has no tags array.
+    Remote flag: No structured flag; regex only.
+    """
     try:
         api_key = os.getenv("JOOBLE_API_KEY")
         if not api_key:
@@ -938,7 +1238,7 @@ def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                 f"https://jooble.org/api/{api_key}?full_description=true",
                 json={
                     "keywords": role,
-                    "location": "United States",
+                    "location": "United States",   # enforce US at request level
                     "page": page,
                 },
                 timeout=30,
@@ -954,12 +1254,18 @@ def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                 break
 
             for item in page_results:
+                # ── Additional post-fetch US guard ──────────────────────────────
+                # Jooble may still return international listings; reject them.
+                job_location = item.get("location", "")
+                if not _is_us_location(job_location):
+                    continue
+
                 job_url = item.get("url")
                 if job_url and job_url not in existing_urls:
                     row = build_row(
                         job_title=item.get("title"),
                         company=item.get("company"),
-                        location=item.get("location"),
+                        location=job_location,
                         description=item.get("description"),
                         salary_raw=item.get("salary"),
                         job_url=job_url,
@@ -972,7 +1278,7 @@ def fetch_jooble(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
             time.sleep(1)
 
-        print(f"[Jooble] {role}: {len(rows)} new jobs (pages 1-{min(10, page)}).")
+        print(f"[Jooble] {role}: {len(rows)} new jobs.")
         return rows
     except Exception as e:
         print(f"[Jooble] {role}: Error: {e}")
@@ -1065,7 +1371,16 @@ def fetch_usajobs(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
 
 def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
-    """Fetch jobs from The Muse API for a specific role with pagination."""
+    """
+    Fetch jobs from The Muse API for a specific role with pagination.
+    
+    US filter  : Added "location": "USA" request parameter.
+                 build_row also calls _is_us_location() as secondary guard.
+    Remote flag: _extract_api_remote_flag() reads locations[].name for
+                 "Remote" / "Flexible" entries.
+    Tags       : _extract_api_tags() reads tags[].name – The Muse's rich
+                 skill tag array (e.g. "Python", "SQL", "Product Analytics").
+    """
     try:
         rows = []
         for page in range(0, 10):
@@ -1074,7 +1389,8 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                 params={
                     "page": page,
                     "search_query": role,
-                    "full_description": "true",
+                    "location": "USA",    # ← NEW: restrict to US listings
+                    "descending": "true",
                 },
                 timeout=30,
             )
@@ -1091,6 +1407,7 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                     if loc.get("name")
                 ]
                 job_url = item.get("refs", {}).get("landing_page")
+
                 if job_url and job_url not in existing_urls:
                     row = build_row(
                         job_title=item.get("name"),
@@ -1100,6 +1417,8 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                         salary_raw=item.get("salary"),
                         job_url=job_url,
                         date_posted=item.get("published_at"),
+                        # Full item passed so _extract_api_tags reads tags[].name
+                        # and _extract_api_remote_flag reads locations[]
                         api_dict=item,
                     )
                     if row:
@@ -1108,41 +1427,96 @@ def fetch_themuse(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
             time.sleep(1)
 
-        print(f"[The Muse] {role}: {len(rows)} new jobs (pages 0-{min(10, page)}).")
+        print(f"[The Muse] {role}: {len(rows)} new jobs.")
         return rows
     except Exception as e:
         print(f"[The Muse] {role}: Error: {e}")
         return []
 
 
+# Locations that indicate a job is open to US-based candidates.
+# Remotive's candidate_required_location values are free-text; this is an
+# allow-list of common values we accept.
+_REMOTIVE_US_ALLOW = re.compile(
+    r"""
+    \b(?:
+        worldwide | anywhere | global | us(?:a)?
+      | united\s+states
+      | north\s+america
+      | canada\s+or\s+us | us\s+or\s+canada
+      | americas?
+      | english[\s\-]speaking
+      | cet[\s\-\+\d]*      # timezone refs that include US hours
+    )\b
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
 def fetch_remotive(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
-    """Fetch jobs from Remotive API for a specific role with pagination."""
+    """
+    Fetch jobs from Remotive API for a specific role with pagination.
+    
+    US filter  : Remotive is a remote-only board; no physical country filter
+                 exists in the API.  We allow jobs where
+                 candidate_required_location matches _REMOTIVE_US_ALLOW
+                 (Worldwide, USA, North America, etc.) OR is empty/None.
+                 Jobs restricted to "Europe", "UK", "Germany", etc. are
+                 dropped via _is_us_location() + the allow-list check below.
+    Remote flag: Every Remotive job is remote by definition.  We inject
+                 _remote_confirmed=True into api_dict so
+                 _extract_api_remote_flag() returns True.
+    Tags       : _extract_api_tags() reads tags[] (list of strings).
+    """
     try:
-        rows = []
+        rows   = []
         offset = 0
-        for page in range(10):
+        for _ in range(10):
             response = requests.get(
                 "https://remotive.com/api/remote-jobs",
                 params={
                     "search": role,
-                    "limit": 100,
+                    "limit":  100,
                     "offset": offset,
                 },
                 timeout=30,
             )
             response.raise_for_status()
-            data = response.json()
+            data         = response.json()
             page_results = data.get("jobs", [])
             if not page_results:
                 break
 
             for item in page_results:
+                candidate_location = item.get("candidate_required_location") or ""
+
+                # ── US allow-list filter ───────────────────────────────────────────
+                # Accept: empty/None, "Worldwide", "USA", "North America", etc.
+                # Reject: "Europe", "Germany", "UK", "APAC", etc.
+                if candidate_location:
+                    loc_lower = candidate_location.lower().strip()
+                    # Explicit reject: known non-US-inclusive regions
+                    if any(term in loc_lower for term in (
+                        "europe", "germany", "uk", "united kingdom", "france",
+                        "spain", "italy", "poland", "netherlands", "brazil",
+                        "latam", "latin america", "apac", "asia", "africa",
+                        "australia", "new zealand", "india", "emea",
+                    )):
+                        continue
+                    # Accept only if it matches our allow-list OR is ambiguous
+                    if not _REMOTIVE_US_ALLOW.search(candidate_location):
+                        # Unknown region string – be conservative and skip
+                        continue
+
                 job_url = item.get("url")
                 if job_url and job_url not in existing_urls:
+                    # Inject remote confirmed flag for _extract_api_remote_flag
+                    item["_remote_confirmed"] = True
+
                     row = build_row(
                         job_title=item.get("title"),
                         company=item.get("company_name"),
-                        location=item.get("candidate_required_location"),
+                        location=candidate_location or "Remote",
                         description=item.get("description"),
                         salary_raw=item.get("salary"),
                         job_url=job_url,
@@ -1156,7 +1530,7 @@ def fetch_remotive(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
             offset += 100
             time.sleep(1)
 
-        print(f"[Remotive] {role}: {len(rows)} new jobs (offsets 0-{offset - 100}).")
+        print(f"[Remotive] {role}: {len(rows)} new jobs.")
         return rows
     except Exception as e:
         print(f"[Remotive] {role}: Error: {e}")
@@ -1164,7 +1538,15 @@ def fetch_remotive(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
 
 def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
-    """Fetch jobs from Arbeitnow API for a specific role with pagination."""
+    """
+    Fetch jobs from Arbeitnow API for a specific role with pagination.
+    
+    US filter  : Added "location": "United States" request parameter.
+                 build_row also calls _is_us_location() as secondary guard
+                 (Arbeitnow is EU-focused so leakage is common).
+    Remote flag: item["remote"] boolean read by _extract_api_remote_flag().
+    Tags       : _extract_api_tags() reads tags[] (list of strings).
+    """
     try:
         rows = []
         for page in range(1, 11):
@@ -1174,6 +1556,7 @@ def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                     "search": role,
                     "page": page,
                     "limit": 100,
+                    "location": "United States",   # ← NEW: US filter at request level
                 },
                 timeout=30,
             )
@@ -1184,16 +1567,26 @@ def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
                 break
 
             for item in page_results:
+                # ── Secondary post-fetch US guard ────────────────────────────────
+                # Arbeitnow may still return EU jobs; reject them.
+                job_location = item.get("location", "")
+                if not _is_us_location(job_location):
+                    continue
+
                 job_url = item.get("url")
                 if job_url and job_url not in existing_urls:
                     row = build_row(
                         job_title=item.get("title"),
                         company=item.get("company_name"),
-                        location=item.get("location"),
+                        location=job_location,
                         description=item.get("description"),
                         salary_raw=item.get("salary"),
                         job_url=job_url,
-                        date_posted=item.get("publication_date") or item.get("posted_date"),
+                        date_posted=(
+                            item.get("publication_date") or item.get("posted_date")
+                        ),
+                        # Full item passed so _extract_api_remote_flag reads
+                        # item["remote"] and _extract_api_tags reads item["tags"]
                         api_dict=item,
                     )
                     if row:
@@ -1202,10 +1595,11 @@ def fetch_arbeitnow(role: str, existing_urls: Set[str]) -> List[Dict[str, Any]]:
 
             time.sleep(1)
 
-        print(f"[Arbeitnow] {role}: {len(rows)} new jobs (pages 1-{min(10, page)}).")
+        print(f"[Arbeitnow] {role}: {len(rows)} new jobs.")
         return rows
     except Exception as e:
         print(f"[Arbeitnow] {role}: Error: {e}")
+        return []
         return []
 
 
