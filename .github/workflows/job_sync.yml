@@ -25,8 +25,10 @@ jobs:
           pip install -r requirements.txt
       
       - name: Set up Google Cloud credentials
+        env:
+          GCP_JSON: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials.json
+          echo "$GCP_JSON" > credentials.json
       
       - name: Run job data pipeline
         env:
@@ -38,7 +40,7 @@ jobs:
           THE_MUSE_API_KEY: ${{ secrets.THE_MUSE_API_KEY }}
           REMOTIVE_API_KEY: ${{ secrets.REMOTIVE_API_KEY }}
           ARBEITNOW_API_KEY: ${{ secrets.ARBEITNOW_API_KEY }}
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          BQ_PROJECT_ID: ${{ secrets.BQ_PROJECT_ID }}
         run: |
           python main.py
       
