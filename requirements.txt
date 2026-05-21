@@ -1,8 +1,10 @@
-beautifulsoup4
-requests
-python-dotenv
+requests==2.32.3
+python-dotenv==1.0.1
+google-cloud-bigquery==3.25.0
 pandas
-google-cloud-bigquery
-google-auth
-python-dateutil
-geonamescache>=1.6.0
+tenacity==9.0.0
+ratelimit==2.2.1
+cloudscraper==1.2.71
+beautifulsoup4==4.12.3
+lxml==5.3.0
+tqdm==4.66.5

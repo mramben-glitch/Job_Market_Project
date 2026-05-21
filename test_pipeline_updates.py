@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Quick test of pipeline update functions."""
 
-from main import _is_us_location, _merge_remote_status, extract_state
+from main_old import _is_us_location, _merge_remote_status, extract_state
 
 # Test _is_us_location
 test_cases = [

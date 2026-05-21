@@ -1,0 +1,809 @@
+2026-05-19 01:03:40,356 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:03:40,357 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE — STARTING
+2026-05-19 01:03:40,358 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:03:40,641 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 01:03:40,836 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 01:03:40,850 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 01:03:41,021 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 01:03:41,072 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 01:03:41,223 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 01:03:41,358 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:03:41,412 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 01:03:41,473 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 01:03:41,474 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 01:03:41,516 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-19 01:03:41,538 | INFO    | job_etl              | [jooble] 'Data Analyst': 40 raw jobs
+2026-05-19 01:03:41,633 | ERROR   | job_etl              | [usajobs] 'Data Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:41,634 | INFO    | job_etl              | [usajobs] 'Data Analyst': 0 raw jobs
+2026-05-19 01:03:41,646 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 01:03:41,849 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 01:03:41,865 | ERROR   | job_etl              | [usajobs] 'Product Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:41,865 | INFO    | job_etl              | [usajobs] 'Product Analyst': 0 raw jobs
+2026-05-19 01:03:42,015 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 01:03:42,047 | ERROR   | job_etl              | [usajobs] 'Marketing Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:42,055 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-19 01:03:42,081 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:03:42,187 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 01:03:42,211 | INFO    | job_etl              | [jooble] 'Product Analyst': 40 raw jobs
+2026-05-19 01:03:42,676 | ERROR   | job_etl              | [usajobs] 'Business Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:42,677 | INFO    | job_etl              | [usajobs] 'Business Analyst': 0 raw jobs
+2026-05-19 01:03:42,776 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:03:42,897 | ERROR   | job_etl              | [usajobs] 'Business Intelligence Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:42,898 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:03:42,908 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 40 raw jobs
+2026-05-19 01:03:43,406 | ERROR   | job_etl              | [usajobs] 'Financial Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:43,408 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:03:43,547 | INFO    | job_etl              | [jooble] 'Business Analyst': 40 raw jobs
+2026-05-19 01:03:43,864 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 01:03:43,897 | ERROR   | job_etl              | [usajobs] 'Operation Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:03:43,899 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:03:44,118 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:03:44,254 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 40 raw jobs
+2026-05-19 01:03:44,377 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-19 01:03:44,386 | ERROR   | job_etl              | [usajobs] 'Data Scientist': sequence item 2: expected str instance, list found
+2026-05-19 01:03:44,388 | INFO    | job_etl              | [usajobs] 'Data Scientist': 0 raw jobs
+2026-05-19 01:03:44,484 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:03:44,573 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:03:44,708 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:03:44,787 | ERROR   | job_etl              | [arbeitnow] page 1 'Data Scientist': 'int' object is not subscriptable
+2026-05-19 01:03:44,787 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 01:03:44,946 | INFO    | job_etl              | [jooble] 'Financial Analyst': 40 raw jobs
+2026-05-19 01:03:45,134 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:03:45,646 | INFO    | job_etl              | [jooble] 'Operation Analyst': 40 raw jobs
+2026-05-19 01:03:45,751 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:03:45,908 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-19 01:03:46,469 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-19 01:03:46,473 | INFO    | job_etl              | [jooble] 'Data Scientist': 40 raw jobs
+2026-05-19 01:03:47,379 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-19 01:03:48,579 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-19 01:03:49,499 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:03:50,542 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:03:51,580 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-19 01:03:51,592 | INFO    | job_etl              | TOTAL RAW: 865 jobs across all APIs
+2026-05-19 01:03:57,926 | INFO    | job_etl              | Loaded 0 existing fingerprints from BigQuery
+2026-05-19 01:03:57,941 | INFO    | job_etl              | After cross-BQ dedup: 496 new rows to insert (of 496)
+2026-05-19 01:16:15,032 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:16:15,033 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE — STARTING
+2026-05-19 01:16:15,033 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:16:15,347 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 01:16:15,503 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 01:16:15,526 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 01:16:15,690 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 01:16:15,838 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 01:16:15,900 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 01:16:16,118 | INFO    | job_etl              | [jooble] 'Data Analyst': 40 raw jobs
+2026-05-19 01:16:16,121 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 01:16:16,296 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-19 01:16:16,326 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:16:16,359 | ERROR   | job_etl              | [usajobs] 'Data Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:16,360 | INFO    | job_etl              | [usajobs] 'Data Analyst': 0 raw jobs
+2026-05-19 01:16:16,363 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 01:16:16,458 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 01:16:16,459 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 01:16:16,593 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 01:16:16,653 | ERROR   | job_etl              | [usajobs] 'Product Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:16,654 | INFO    | job_etl              | [usajobs] 'Product Analyst': 0 raw jobs
+2026-05-19 01:16:16,747 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 01:16:16,748 | INFO    | job_etl              | [OK] [remotive] returned 144 raw records
+2026-05-19 01:16:16,771 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-19 01:16:16,779 | INFO    | job_etl              | [jooble] 'Product Analyst': 40 raw jobs
+2026-05-19 01:16:16,873 | ERROR   | job_etl              | [usajobs] 'Marketing Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:16,874 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:16:17,284 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 01:16:17,498 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 40 raw jobs
+2026-05-19 01:16:17,579 | ERROR   | job_etl              | [usajobs] 'Business Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:17,581 | INFO    | job_etl              | [usajobs] 'Business Analyst': 0 raw jobs
+2026-05-19 01:16:17,824 | ERROR   | job_etl              | [usajobs] 'Business Intelligence Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:17,824 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:16:17,950 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:16:18,000 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-19 01:16:18,122 | INFO    | job_etl              | [jooble] 'Business Analyst': 40 raw jobs
+2026-05-19 01:16:18,255 | ERROR   | job_etl              | [usajobs] 'Financial Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:18,257 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:16:18,719 | ERROR   | job_etl              | [usajobs] 'Operation Analyst': sequence item 2: expected str instance, list found
+2026-05-19 01:16:18,721 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:16:18,738 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 01:16:18,831 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 40 raw jobs
+2026-05-19 01:16:18,882 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:16:19,192 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:16:19,230 | ERROR   | job_etl              | [usajobs] 'Data Scientist': sequence item 2: expected str instance, list found
+2026-05-19 01:16:19,231 | INFO    | job_etl              | [usajobs] 'Data Scientist': 0 raw jobs
+2026-05-19 01:16:19,232 | INFO    | job_etl              | [OK] [usajobs] returned 0 raw records
+2026-05-19 01:16:19,308 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:16:19,414 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:16:19,493 | ERROR   | job_etl              | [arbeitnow] page 1 'Data Scientist': 'int' object is not subscriptable
+2026-05-19 01:16:19,494 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 01:16:19,494 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-19 01:16:19,514 | INFO    | job_etl              | [jooble] 'Financial Analyst': 40 raw jobs
+2026-05-19 01:16:19,579 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-19 01:16:19,858 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:16:20,172 | INFO    | job_etl              | [jooble] 'Operation Analyst': 40 raw jobs
+2026-05-19 01:16:20,434 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:16:20,798 | INFO    | job_etl              | [jooble] 'Data Scientist': 40 raw jobs
+2026-05-19 01:16:20,798 | INFO    | job_etl              | [OK] [jooble] returned 320 raw records
+2026-05-19 01:16:21,083 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-19 01:16:21,083 | INFO    | job_etl              | [OK] [themuse] returned 1 raw records
+2026-05-19 01:16:22,613 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-19 01:16:23,520 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-19 01:16:24,355 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:16:25,277 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:16:26,301 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-19 01:16:26,302 | INFO    | job_etl              | [OK] [adzuna] returned 400 raw records
+2026-05-19 01:16:26,303 | INFO    | job_etl              | TOTAL RAW: 865 jobs across all APIs
+2026-05-19 01:16:29,993 | INFO    | job_etl              | Table my-first-project-27273.data_job_market.us_job_data exists.
+2026-05-19 01:16:31,728 | INFO    | job_etl              | Loaded 0 existing fingerprints from BigQuery
+2026-05-19 01:16:31,738 | INFO    | job_etl              | After cross-BQ dedup: 495 new rows to insert (of 495)
+2026-05-19 01:16:36,351 | INFO    | job_etl              | BQ LOAD COMPLETE — 495 rows inserted via Load Job.
+2026-05-19 01:16:36,352 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:16:36,352 | INFO    | job_etl              |   PIPELINE COMPLETE in 21.3s
+2026-05-19 01:16:36,352 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:16:36,352 | INFO    | job_etl              | RAW BY API:
+2026-05-19 01:16:36,353 | INFO    | job_etl              |   raw_remotive: 144
+2026-05-19 01:16:36,353 | INFO    | job_etl              |   raw_usajobs: 0
+2026-05-19 01:16:36,353 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-19 01:16:36,354 | INFO    | job_etl              |   raw_jooble: 320
+2026-05-19 01:16:36,354 | INFO    | job_etl              |   raw_themuse: 1
+2026-05-19 01:16:36,354 | INFO    | job_etl              |   raw_adzuna: 400
+2026-05-19 01:16:36,354 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-19 01:16:36,355 | INFO    | job_etl              |   accepted_jooble: 276
+2026-05-19 01:16:36,355 | INFO    | job_etl              |   accepted_adzuna: 219
+2026-05-19 01:16:36,355 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-19 01:16:36,356 | INFO    | job_etl              |   no_us_state_identified: 202
+2026-05-19 01:16:36,356 | INFO    | job_etl              |   country_not_us:worldwide: 40
+2026-05-19 01:16:36,356 | INFO    | job_etl              |   veto:israel: 16
+2026-05-19 01:16:36,356 | INFO    | job_etl              |   remote_no_us_marker: 11
+2026-05-19 01:16:36,357 | INFO    | job_etl              |   veto:canada: 8
+2026-05-19 01:16:36,357 | INFO    | job_etl              |   country_not_us:latam: 8
+2026-05-19 01:16:36,358 | INFO    | job_etl              |   veto:switzerland: 8
+2026-05-19 01:16:36,359 | INFO    | job_etl              |   veto:philippines: 8
+2026-05-19 01:16:36,359 | INFO    | job_etl              |   veto:india: 7
+2026-05-19 01:16:36,360 | INFO    | job_etl              |   veto:paris: 6
+2026-05-19 01:16:36,360 | INFO    | job_etl              |   veto:melbourne: 3
+2026-05-19 01:16:36,360 | INFO    | job_etl              |   veto:vienna: 1
+2026-05-19 01:16:36,361 | INFO    | job_etl              |   veto:warsaw: 1
+2026-05-19 01:16:36,361 | INFO    | job_etl              |   veto:mexico: 1
+2026-05-19 01:16:36,361 | INFO    | job_etl              | DUPLICATES SKIPPED: 34
+2026-05-19 01:16:36,362 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 0
+2026-05-19 01:44:15,173 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:44:15,173 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-19 01:44:15,174 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:44:15,480 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 01:44:15,573 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 01:44:15,680 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 01:44:15,709 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 01:44:15,799 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 01:44:15,897 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 01:44:15,929 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 01:44:16,012 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 01:44:16,146 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 01:44:16,257 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:44:16,269 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 01:44:16,270 | INFO    | job_etl              | [OK] [remotive] returned 144 raw records
+2026-05-19 01:44:16,334 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-19 01:44:16,385 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 01:44:16,385 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 01:44:16,409 | INFO    | job_etl              | [jooble] 'Data Analyst': 40 raw jobs
+2026-05-19 01:44:16,436 | INFO    | job_etl              | [usajobs] 'Data Analyst': 50 raw jobs
+2026-05-19 01:44:16,838 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 01:44:16,897 | INFO    | job_etl              | [usajobs] 'Product Analyst': 10 raw jobs
+2026-05-19 01:44:17,040 | INFO    | job_etl              | [jooble] 'Product Analyst': 40 raw jobs
+2026-05-19 01:44:17,113 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 1 raw jobs
+2026-05-19 01:44:17,334 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-19 01:44:17,355 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:44:17,667 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 40 raw jobs
+2026-05-19 01:44:17,722 | INFO    | job_etl              | [usajobs] 'Business Analyst': 50 raw jobs
+2026-05-19 01:44:17,891 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 01:44:17,983 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 11 raw jobs
+2026-05-19 01:44:18,402 | INFO    | job_etl              | [jooble] 'Business Analyst': 40 raw jobs
+2026-05-19 01:44:18,427 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:44:18,447 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:44:18,843 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:44:18,962 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-19 01:44:18,963 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:44:19,020 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:44:19,044 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 40 raw jobs
+2026-05-19 01:44:19,107 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:44:19,316 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:44:19,429 | ERROR   | job_etl              | [arbeitnow] page 1 'Data Scientist': 'int' object is not subscriptable
+2026-05-19 01:44:19,429 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 01:44:19,430 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-19 01:44:19,537 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:44:19,547 | INFO    | job_etl              | [usajobs] 'Data Scientist': 50 raw jobs
+2026-05-19 01:44:19,548 | INFO    | job_etl              | [OK] [usajobs] returned 272 raw records
+2026-05-19 01:44:19,825 | INFO    | job_etl              | [jooble] 'Financial Analyst': 40 raw jobs
+2026-05-19 01:44:20,042 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-19 01:44:20,065 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-19 01:44:20,065 | INFO    | job_etl              | [OK] [themuse] returned 1 raw records
+2026-05-19 01:44:20,430 | INFO    | job_etl              | [jooble] 'Operation Analyst': 40 raw jobs
+2026-05-19 01:44:21,037 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-19 01:44:21,118 | INFO    | job_etl              | [jooble] 'Data Scientist': 40 raw jobs
+2026-05-19 01:44:21,119 | INFO    | job_etl              | [OK] [jooble] returned 320 raw records
+2026-05-19 01:44:22,233 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-19 01:44:23,312 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:44:24,303 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:44:25,455 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-19 01:44:25,456 | INFO    | job_etl              | [OK] [adzuna] returned 400 raw records
+2026-05-19 01:44:25,457 | INFO    | job_etl              | TOTAL RAW: 1137 jobs across all APIs
+2026-05-19 01:44:36,023 | INFO    | job_etl              | [OK] Created table my-first-project-27273.data_job_market.us_job_data
+2026-05-19 01:44:37,307 | INFO    | job_etl              | Loaded 0 existing fingerprints
+2026-05-19 01:44:37,313 | INFO    | job_etl              | After cross-BQ dedup: 704 new rows
+2026-05-19 01:44:41,191 | INFO    | job_etl              | BQ LOAD COMPLETE — 704 rows inserted via Load Job.
+2026-05-19 01:44:41,191 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:44:41,191 | INFO    | job_etl              |   PIPELINE COMPLETE in 26.0s
+2026-05-19 01:44:41,191 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:44:41,192 | INFO    | job_etl              | RAW BY API:
+2026-05-19 01:44:41,192 | INFO    | job_etl              |   raw_remotive: 144
+2026-05-19 01:44:41,192 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-19 01:44:41,192 | INFO    | job_etl              |   raw_usajobs: 272
+2026-05-19 01:44:41,192 | INFO    | job_etl              |   raw_themuse: 1
+2026-05-19 01:44:41,192 | INFO    | job_etl              |   raw_jooble: 320
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   raw_adzuna: 400
+2026-05-19 01:44:41,193 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   accepted_remotive: 11
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   accepted_usajobs: 201
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   accepted_jooble: 279
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   accepted_adzuna: 213
+2026-05-19 01:44:41,193 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-19 01:44:41,193 | INFO    | job_etl              |   no_us_state_identified: 156
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   remote_no_us_marker: 27
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:israel: 16
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:india: 14
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:canada: 8
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:switzerland: 8
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:brazil: 8
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:melbourne: 5
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:paris: 3
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:vienna: 2
+2026-05-19 01:44:41,194 | INFO    | job_etl              |   veto:belgium: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:london: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:italy: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:united kingdom: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:japan: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:china: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              |   veto:mexico: 1
+2026-05-19 01:44:41,195 | INFO    | job_etl              | DUPLICATES SKIPPED: 165
+2026-05-19 01:44:41,195 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 0
+2026-05-19 01:55:59,878 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:55:59,879 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-19 01:55:59,879 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:56:00,108 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 01:56:00,199 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 01:56:00,289 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 01:56:00,293 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 01:56:00,399 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 01:56:00,482 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 01:56:00,496 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 01:56:00,587 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 01:56:00,663 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:56:00,719 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 01:56:00,724 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 01:56:00,724 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 01:56:00,750 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-19 01:56:00,810 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 01:56:00,810 | INFO    | job_etl              | [OK] [remotive] returned 144 raw records
+2026-05-19 01:56:01,074 | INFO    | job_etl              | [jooble] 'Data Analyst': 40 raw jobs
+2026-05-19 01:56:01,260 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 01:56:01,444 | INFO    | job_etl              | [usajobs] 'Data Analyst': 50 raw jobs
+2026-05-19 01:56:01,560 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-19 01:56:01,685 | INFO    | job_etl              | [jooble] 'Product Analyst': 40 raw jobs
+2026-05-19 01:56:01,722 | INFO    | job_etl              | [usajobs] 'Product Analyst': 10 raw jobs
+2026-05-19 01:56:01,780 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 01:56:01,881 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 1 raw jobs
+2026-05-19 01:56:02,356 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 01:56:02,423 | INFO    | job_etl              | [usajobs] 'Business Analyst': 50 raw jobs
+2026-05-19 01:56:02,425 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 40 raw jobs
+2026-05-19 01:56:02,640 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 11 raw jobs
+2026-05-19 01:56:02,987 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:56:03,033 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:56:03,081 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-19 01:56:03,137 | INFO    | job_etl              | [jooble] 'Business Analyst': 40 raw jobs
+2026-05-19 01:56:03,446 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:56:03,603 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:56:03,831 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 40 raw jobs
+2026-05-19 01:56:03,905 | INFO    | job_etl              | [usajobs] 'Data Scientist': 50 raw jobs
+2026-05-19 01:56:03,905 | INFO    | job_etl              | [OK] [usajobs] returned 272 raw records
+2026-05-19 01:56:04,158 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-19 01:56:04,172 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:56:04,508 | INFO    | job_etl              | [jooble] 'Financial Analyst': 40 raw jobs
+2026-05-19 01:56:04,776 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-19 01:56:04,777 | INFO    | job_etl              | [OK] [themuse] returned 1 raw records
+2026-05-19 01:56:05,141 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-19 01:56:05,143 | INFO    | job_etl              | [jooble] 'Operation Analyst': 40 raw jobs
+2026-05-19 01:56:05,771 | INFO    | job_etl              | [jooble] 'Data Scientist': 40 raw jobs
+2026-05-19 01:56:05,772 | INFO    | job_etl              | [OK] [jooble] returned 320 raw records
+2026-05-19 01:56:06,178 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-19 01:56:07,048 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Intelligence Analyst': 403 Client Error: Forbidden for url: https://www.arbeitnow.com/api/job-board-api?page=1
+2026-05-19 01:56:07,048 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 01:56:07,258 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-19 01:56:07,412 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 01:56:07,641 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 01:56:07,730 | ERROR   | job_etl              | [arbeitnow] page 1 'Data Scientist': 'int' object is not subscriptable
+2026-05-19 01:56:07,731 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 01:56:07,731 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-19 01:56:08,177 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-19 01:56:09,066 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-19 01:56:09,066 | INFO    | job_etl              | [OK] [adzuna] returned 400 raw records
+2026-05-19 01:56:09,067 | INFO    | job_etl              | TOTAL RAW: 1137 jobs across all APIs
+2026-05-19 01:56:11,710 | INFO    | job_etl              | [OK] Created table my-first-project-27273.data_job_market.us_job_data
+2026-05-19 01:56:12,978 | INFO    | job_etl              | Loaded 0 existing fingerprints
+2026-05-19 01:56:12,982 | INFO    | job_etl              | After cross-BQ dedup: 374 new rows
+2026-05-19 01:56:16,788 | INFO    | job_etl              | BQ LOAD COMPLETE — 374 rows inserted via Load Job.
+2026-05-19 01:56:16,788 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:56:16,788 | INFO    | job_etl              |   PIPELINE COMPLETE in 16.9s
+2026-05-19 01:56:16,788 | INFO    | job_etl              | ======================================================================
+2026-05-19 01:56:16,788 | INFO    | job_etl              | RAW BY API:
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_remotive: 144
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_usajobs: 272
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_themuse: 1
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_jooble: 320
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   raw_adzuna: 400
+2026-05-19 01:56:16,789 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   accepted_usajobs: 27
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   accepted_jooble: 162
+2026-05-19 01:56:16,789 | INFO    | job_etl              |   accepted_adzuna: 185
+2026-05-19 01:56:16,790 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   unrelated_job_title: 562
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   no_us_state_identified: 132
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   remote_no_us_marker: 7
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   veto:india: 3
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   veto:paris: 3
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   veto:melbourne: 2
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   veto:vienna: 1
+2026-05-19 01:56:16,790 | INFO    | job_etl              |   veto:mexico: 1
+2026-05-19 01:56:16,791 | INFO    | job_etl              | DUPLICATES SKIPPED: 39
+2026-05-19 01:56:16,791 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 0
+2026-05-19 17:00:58,387 | INFO    | job_etl              | ======================================================================
+2026-05-19 17:00:58,388 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-19 17:00:58,388 | INFO    | job_etl              | ======================================================================
+2026-05-19 17:00:58,633 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 17:00:58,743 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 17:00:58,825 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 17:00:58,929 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 17:00:58,938 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 17:00:59,049 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 17:00:59,105 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 17:00:59,159 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 17:00:59,160 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 17:00:59,162 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 17:00:59,263 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 17:00:59,387 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 17:00:59,502 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 17:00:59,503 | INFO    | job_etl              | [OK] [remotive] returned 144 raw records
+2026-05-19 17:01:00,030 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-19 17:01:00,281 | INFO    | job_etl              | [usajobs] 'Product Analyst': 8 raw jobs
+2026-05-19 17:01:00,545 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 1 raw jobs
+2026-05-19 17:01:01,528 | INFO    | job_etl              | [usajobs] 'Business Analyst': 89 raw jobs
+2026-05-19 17:01:01,707 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 17:01:01,888 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 17:01:01,952 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 11 raw jobs
+2026-05-19 17:01:02,063 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 17:01:02,118 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-19 17:01:02,439 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-19 17:01:02,844 | INFO    | job_etl              | [jooble] 'Data Analyst': 240 raw jobs
+2026-05-19 17:01:02,905 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 53 raw jobs
+2026-05-19 17:01:03,477 | INFO    | job_etl              | [usajobs] 'Data Scientist': 75 raw jobs
+2026-05-19 17:01:03,477 | INFO    | job_etl              | [OK] [usajobs] returned 437 raw records
+2026-05-19 17:01:05,725 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 17:01:06,852 | INFO    | job_etl              | [jooble] 'Product Analyst': 240 raw jobs
+2026-05-19 17:01:08,489 | ERROR   | job_etl              | [arbeitnow] page 2 'Data Scientist': 'int' object is not subscriptable
+2026-05-19 17:01:08,489 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 17:01:08,490 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-19 17:01:09,037 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 17:01:11,039 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 240 raw jobs
+2026-05-19 17:01:12,715 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 17:01:15,333 | INFO    | job_etl              | [jooble] 'Business Analyst': 240 raw jobs
+2026-05-19 17:01:16,025 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 17:01:19,340 | INFO    | job_etl              | [themuse] 'Financial Analyst': 2 raw jobs
+2026-05-19 17:01:19,652 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 240 raw jobs
+2026-05-19 17:01:22,480 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 17:01:24,630 | INFO    | job_etl              | [jooble] 'Financial Analyst': 240 raw jobs
+2026-05-19 17:01:24,991 | INFO    | job_etl              | [adzuna] 'Data Analyst': 250 raw jobs
+2026-05-19 17:01:25,825 | INFO    | job_etl              | [themuse] 'Data Scientist': 1 raw jobs
+2026-05-19 17:01:25,826 | INFO    | job_etl              | [OK] [themuse] returned 4 raw records
+2026-05-19 17:01:28,986 | INFO    | job_etl              | [jooble] 'Operation Analyst': 240 raw jobs
+2026-05-19 17:01:33,298 | INFO    | job_etl              | [jooble] 'Data Scientist': 240 raw jobs
+2026-05-19 17:01:33,299 | INFO    | job_etl              | [OK] [jooble] returned 1920 raw records
+2026-05-19 17:01:35,541 | INFO    | job_etl              | [adzuna] 'Product Analyst': 250 raw jobs
+2026-05-19 17:01:44,605 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 250 raw jobs
+2026-05-19 17:01:52,134 | INFO    | job_etl              | [adzuna] 'Business Analyst': 250 raw jobs
+2026-05-19 17:01:58,984 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 250 raw jobs
+2026-05-19 17:02:16,009 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 250 raw jobs
+2026-05-19 17:02:25,951 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 250 raw jobs
+2026-05-19 17:02:34,997 | INFO    | job_etl              | [adzuna] 'Data Scientist': 250 raw jobs
+2026-05-19 17:02:34,997 | INFO    | job_etl              | [OK] [adzuna] returned 2000 raw records
+2026-05-19 17:02:34,998 | INFO    | job_etl              | TOTAL RAW: 4505 jobs across all APIs
+2026-05-19 17:33:49,086 | INFO    | job_etl              | ======================================================================
+2026-05-19 17:33:49,086 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-19 17:33:49,087 | INFO    | job_etl              | ======================================================================
+2026-05-19 17:33:49,286 | INFO    | job_etl              | [remotive] 'Data Analyst': 18 raw jobs
+2026-05-19 17:33:49,378 | INFO    | job_etl              | [remotive] 'Product Analyst': 18 raw jobs
+2026-05-19 17:33:49,463 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-19 17:33:49,476 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 18 raw jobs
+2026-05-19 17:33:49,573 | INFO    | job_etl              | [remotive] 'Business Analyst': 18 raw jobs
+2026-05-19 17:33:49,688 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-19 17:33:49,905 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-19 17:33:49,992 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-19 17:33:49,992 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-19 17:33:50,230 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 18 raw jobs
+2026-05-19 17:33:50,346 | INFO    | job_etl              | [remotive] 'Financial Analyst': 18 raw jobs
+2026-05-19 17:33:50,478 | INFO    | job_etl              | [remotive] 'Operation Analyst': 18 raw jobs
+2026-05-19 17:33:50,616 | INFO    | job_etl              | [remotive] 'Data Scientist': 18 raw jobs
+2026-05-19 17:33:50,616 | INFO    | job_etl              | [OK] [remotive] returned 144 raw records
+2026-05-19 17:33:50,670 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-19 17:33:50,876 | INFO    | job_etl              | [usajobs] 'Product Analyst': 8 raw jobs
+2026-05-19 17:33:51,065 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 1 raw jobs
+2026-05-19 17:33:51,856 | INFO    | job_etl              | [usajobs] 'Business Analyst': 89 raw jobs
+2026-05-19 17:33:52,067 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 11 raw jobs
+2026-05-19 17:33:52,375 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 17:33:52,696 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-19 17:33:52,758 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-19 17:33:52,897 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-19 17:33:53,137 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 53 raw jobs
+2026-05-19 17:33:53,779 | INFO    | job_etl              | [usajobs] 'Data Scientist': 75 raw jobs
+2026-05-19 17:33:53,779 | INFO    | job_etl              | [OK] [usajobs] returned 437 raw records
+2026-05-19 17:33:59,298 | ERROR   | job_etl              | [arbeitnow] page 2 'Data Scientist': 403 Client Error: Forbidden for url: https://www.arbeitnow.com/api/job-board-api?page=2
+2026-05-19 17:33:59,299 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-19 17:33:59,299 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-19 17:34:04,675 | INFO    | job_etl              | [jooble] 'Data Analyst': 1000 raw jobs
+2026-05-19 17:34:05,306 | INFO    | job_etl              | [themuse] 'Data Analyst': 7 raw jobs
+2026-05-19 17:34:20,203 | INFO    | job_etl              | [adzuna] 'Data Analyst': 1000 raw jobs
+2026-05-19 17:34:20,301 | INFO    | job_etl              | [jooble] 'Product Analyst': 1000 raw jobs
+2026-05-19 17:34:20,634 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-19 17:34:35,609 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-19 17:34:35,617 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 1000 raw jobs
+2026-05-19 17:34:40,611 | INFO    | job_etl              | [adzuna] 'Product Analyst': 850 raw jobs
+2026-05-19 17:34:50,396 | INFO    | job_etl              | [jooble] 'Business Analyst': 1000 raw jobs
+2026-05-19 17:34:50,641 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-19 17:34:56,852 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 650 raw jobs
+2026-05-19 17:35:06,522 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-19 17:35:06,779 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 1000 raw jobs
+2026-05-19 17:35:20,975 | INFO    | job_etl              | [themuse] 'Financial Analyst': 3 raw jobs
+2026-05-19 17:35:22,052 | INFO    | job_etl              | [jooble] 'Financial Analyst': 1000 raw jobs
+2026-05-19 17:35:25,218 | INFO    | job_etl              | [adzuna] 'Business Analyst': 1000 raw jobs
+2026-05-19 17:35:35,802 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-19 17:35:37,322 | INFO    | job_etl              | [jooble] 'Operation Analyst': 1000 raw jobs
+2026-05-19 17:35:37,882 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 401 raw jobs
+2026-05-19 17:35:49,556 | INFO    | job_etl              | [themuse] 'Data Scientist': 2 raw jobs
+2026-05-19 17:35:49,556 | INFO    | job_etl              | [OK] [themuse] returned 13 raw records
+2026-05-19 17:35:52,737 | INFO    | job_etl              | [jooble] 'Data Scientist': 1000 raw jobs
+2026-05-19 17:35:52,738 | INFO    | job_etl              | [OK] [jooble] returned 8000 raw records
+2026-05-19 17:36:00,302 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 1000 raw jobs
+2026-05-19 17:36:24,602 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 1000 raw jobs
+2026-05-19 17:36:46,265 | INFO    | job_etl              | [adzuna] 'Data Scientist': 1000 raw jobs
+2026-05-19 17:36:46,266 | INFO    | job_etl              | [OK] [adzuna] returned 6901 raw records
+2026-05-19 17:36:46,267 | INFO    | job_etl              | TOTAL RAW: 15495 jobs across all APIs
+2026-05-20 02:55:48,936 | WARNING | job_etl              | Could not fetch existing hashes: 400 No matching signature for operator >= for argument types: TIMESTAMP, DATE
+  Signature: T1 >= T1
+    Unable to find common supertype for templated argument <T1>
+      Input types for <T1>: {DATE, TIMESTAMP} at [4:15]; reason: invalidQuery, location: query, message: No matching signature for operator >= for argument types: TIMESTAMP, DATE
+  Signature: T1 >= T1
+    Unable to find common supertype for templated argument <T1>
+      Input types for <T1>: {DATE, TIMESTAMP} at [4:15]
+
+Location: US
+Job ID: 70f233bd-9c65-4861-ba60-f46c6dca8ba8
+
+2026-05-20 02:55:48,943 | INFO    | job_etl              | Loaded 0 existing fingerprints
+2026-05-20 02:55:48,982 | INFO    | job_etl              | After cross-BQ dedup: 4881 new rows
+2026-05-20 02:55:51,838 | ERROR   | job_etl              | BQ LOAD ERROR: 400 Error while reading data, error message: JSON table encountered too many errors, giving up. Rows: 1; errors: 1. Please look into the errors[] collection for more details.; reason: invalid, message: Error while reading data, error message: JSON table encountered too many errors, giving up. Rows: 1; errors: 1. Please look into the errors[] collection for more details.; reason: invalid, message: Error while reading data, error message: JSON processing encountered too many errors, giving up. Rows: 1; errors: 1; max bad: 0; error percent: 0; reason: invalidQuery, location: query, message: Could not parse '2026-05-19' as a timestamp. Required format is YYYY-MM-DD HH:MM[:SS[.SSSSSS]] or YYYY/MM/DD HH:MM[:SS[.SSSSSS]] Field: date_retrieved; Value: 2026-05-19
+2026-05-20 02:55:51,838 | INFO    | job_etl              | ======================================================================
+2026-05-20 02:55:51,838 | INFO    | job_etl              |   PIPELINE COMPLETE in 33722.8s
+2026-05-20 02:55:51,838 | INFO    | job_etl              | ======================================================================
+2026-05-20 02:55:51,839 | INFO    | job_etl              | RAW BY API:
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_remotive: 144
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_usajobs: 437
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_themuse: 13
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_jooble: 8000
+2026-05-20 02:55:51,839 | INFO    | job_etl              |   raw_adzuna: 6901
+2026-05-20 02:55:51,839 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   accepted_usajobs: 23
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   accepted_themuse: 2
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   accepted_jooble: 2243
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   accepted_adzuna: 2613
+2026-05-20 02:55:51,840 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   unrelated_job_title: 6231
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   no_us_state_identified: 2114
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   remote_no_us_marker: 187
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   veto:india: 83
+2026-05-20 02:55:51,840 | INFO    | job_etl              |   veto:paris: 68
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:mexico: 11
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:vienna: 8
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:melbourne: 7
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:vancouver: 6
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:russia: 5
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:athens: 5
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:london: 3
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:warsaw: 3
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:milan: 3
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:moscow: 3
+2026-05-20 02:55:51,841 | INFO    | job_etl              |   veto:norway: 1
+2026-05-20 02:55:51,842 | INFO    | job_etl              |   veto:canada: 1
+2026-05-20 02:55:51,842 | INFO    | job_etl              |   veto:toronto: 1
+2026-05-20 02:55:51,842 | INFO    | job_etl              |   veto:brazil: 1
+2026-05-20 02:55:51,842 | INFO    | job_etl              |   veto:zurich: 1
+2026-05-20 02:55:51,842 | INFO    | job_etl              | DUPLICATES SKIPPED: 1634
+2026-05-20 02:55:51,842 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 413
+2026-05-20 13:42:27,548 | INFO    | job_etl              | ======================================================================
+2026-05-20 13:42:27,549 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-20 13:42:27,550 | INFO    | job_etl              | ======================================================================
+2026-05-20 13:42:27,866 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-20 13:42:28,052 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-20 13:42:28,278 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-20 13:42:28,311 | INFO    | job_etl              | [usajobs] 'Data Analyst': 5 raw jobs
+2026-05-20 13:42:28,386 | INFO    | job_etl              | [jooble] 'Data Analyst': 20 raw jobs
+2026-05-20 13:42:28,418 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-20 13:42:28,468 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-20 13:42:28,579 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-20 13:42:28,645 | INFO    | job_etl              | [usajobs] 'Product Analyst': 5 raw jobs
+2026-05-20 13:42:28,707 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-20 13:42:28,873 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-20 13:42:29,115 | INFO    | job_etl              | [jooble] 'Product Analyst': 20 raw jobs
+2026-05-20 13:42:29,560 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-20 13:42:29,706 | INFO    | job_etl              | [usajobs] 'Business Analyst': 5 raw jobs
+2026-05-20 13:42:29,714 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-20 13:42:30,141 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 20 raw jobs
+2026-05-20 13:42:30,223 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-20 13:42:30,523 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-20 13:42:30,599 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 5 raw jobs
+2026-05-20 13:42:30,801 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-20 13:42:30,841 | INFO    | job_etl              | [jooble] 'Business Analyst': 20 raw jobs
+2026-05-20 13:42:30,977 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-20 13:42:31,156 | INFO    | job_etl              | [themuse] 'Business Analyst': 0 raw jobs
+2026-05-20 13:42:31,320 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 5 raw jobs
+2026-05-20 13:42:32,084 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 5 raw jobs
+2026-05-20 13:42:32,364 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-20 13:42:32,700 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 20 raw jobs
+2026-05-20 13:42:32,717 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-20 13:42:32,717 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-20 13:42:32,958 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-20 13:42:32,964 | INFO    | job_etl              | [usajobs] 'Data Scientist': 5 raw jobs
+2026-05-20 13:42:32,965 | INFO    | job_etl              | [OK] [usajobs] returned 35 raw records
+2026-05-20 13:42:33,075 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 13:42:33,671 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-20 13:42:33,682 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-20 13:42:33,711 | INFO    | job_etl              | [jooble] 'Financial Analyst': 20 raw jobs
+2026-05-20 13:42:34,116 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-20 13:42:34,152 | INFO    | job_etl              | [jooble] 'Operation Analyst': 20 raw jobs
+2026-05-20 13:42:34,219 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-20 13:42:34,655 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-20 13:42:34,738 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-20 13:42:34,739 | INFO    | job_etl              | [OK] [themuse] returned 0 raw records
+2026-05-20 13:42:34,793 | INFO    | job_etl              | [jooble] 'Data Scientist': 20 raw jobs
+2026-05-20 13:42:34,793 | INFO    | job_etl              | [OK] [jooble] returned 160 raw records
+2026-05-20 13:42:35,170 | ERROR   | job_etl              | [arbeitnow] page 2 'Business Analyst': 'int' object is not subscriptable
+2026-05-20 13:42:35,171 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-20 13:42:36,330 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-20 13:42:37,608 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-20 13:42:38,913 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-20 13:42:38,913 | INFO    | job_etl              | [OK] [adzuna] returned 400 raw records
+2026-05-20 13:42:50,998 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 13:42:53,733 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-20 13:42:54,417 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-20 13:42:55,356 | ERROR   | job_etl              | [arbeitnow] page 3 'Data Scientist': 'int' object is not subscriptable
+2026-05-20 13:42:55,357 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-20 13:42:55,357 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-20 13:42:55,359 | INFO    | job_etl              | TOTAL RAW: 747 jobs across all APIs
+2026-05-20 14:09:32,265 | INFO    | job_etl              | [OK] Created table my-first-project-27273.data_job_market.us_job_data
+2026-05-20 14:09:33,971 | INFO    | job_etl              | Loaded 0 existing fingerprints
+2026-05-20 14:09:33,976 | INFO    | job_etl              | After cross-BQ dedup: 305 new rows
+2026-05-20 14:09:34,009 | INFO    | job_etl              | Emergency backup saved locally to emergency_backup.json
+2026-05-20 14:09:37,044 | ERROR   | job_etl              | BQ LOAD ERROR: 400 Error while reading data, error message: JSON table encountered too many errors, giving up. Rows: 1; errors: 1. Please look into the errors[] collection for more details.; reason: invalid, message: Error while reading data, error message: JSON table encountered too many errors, giving up. Rows: 1; errors: 1. Please look into the errors[] collection for more details.; reason: invalid, message: Error while reading data, error message: JSON processing encountered too many errors, giving up. Rows: 1; errors: 1; max bad: 0; error percent: 0; reason: invalidQuery, location: query, message: Could not parse '2026-05-18' as a timestamp. Required format is YYYY-MM-DD HH:MM[:SS[.SSSSSS]] or YYYY/MM/DD HH:MM[:SS[.SSSSSS]] Field: date_posted; Value: 2026-05-18
+2026-05-20 14:09:37,045 | INFO    | job_etl              | ======================================================================
+2026-05-20 14:09:37,045 | INFO    | job_etl              |   PIPELINE COMPLETE in 1629.5s
+2026-05-20 14:09:37,045 | INFO    | job_etl              | ======================================================================
+2026-05-20 14:09:37,045 | INFO    | job_etl              | RAW BY API:
+2026-05-20 14:09:37,046 | INFO    | job_etl              |   raw_remotive: 152
+2026-05-20 14:09:37,047 | INFO    | job_etl              |   raw_usajobs: 35
+2026-05-20 14:09:37,047 | INFO    | job_etl              |   raw_themuse: 0
+2026-05-20 14:09:37,047 | INFO    | job_etl              |   raw_jooble: 160
+2026-05-20 14:09:37,048 | INFO    | job_etl              |   raw_adzuna: 400
+2026-05-20 14:09:37,048 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-20 14:09:37,049 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-20 14:09:37,049 | INFO    | job_etl              |   accepted_usajobs: 16
+2026-05-20 14:09:37,049 | INFO    | job_etl              |   accepted_jooble: 96
+2026-05-20 14:09:37,050 | INFO    | job_etl              |   accepted_adzuna: 193
+2026-05-20 14:09:37,051 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-20 14:09:37,051 | INFO    | job_etl              |   unrelated_job_title: 271
+2026-05-20 14:09:37,052 | INFO    | job_etl              |   no_us_state_identified: 132
+2026-05-20 14:09:37,052 | INFO    | job_etl              |   veto:paris: 7
+2026-05-20 14:09:37,052 | INFO    | job_etl              |   remote_no_us_marker: 6
+2026-05-20 14:09:37,053 | INFO    | job_etl              |   veto:india: 2
+2026-05-20 14:09:37,054 | INFO    | job_etl              |   veto:melbourne: 2
+2026-05-20 14:09:37,054 | INFO    | job_etl              |   veto:vienna: 1
+2026-05-20 14:09:37,055 | INFO    | job_etl              |   veto:mexico: 1
+2026-05-20 14:09:37,055 | INFO    | job_etl              | DUPLICATES SKIPPED: 15
+2026-05-20 14:09:37,056 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 47
+2026-05-20 14:33:07,058 | INFO    | job_etl              | ======================================================================
+2026-05-20 14:33:07,059 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-20 14:33:07,059 | INFO    | job_etl              | ======================================================================
+2026-05-20 14:33:07,409 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-20 14:33:07,484 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-20 14:33:07,596 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-20 14:33:07,712 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-20 14:33:07,785 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-20 14:33:07,825 | INFO    | job_etl              | [usajobs] 'Data Analyst': 5 raw jobs
+2026-05-20 14:33:07,871 | INFO    | job_etl              | [jooble] 'Data Analyst': 20 raw jobs
+2026-05-20 14:33:07,873 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-20 14:33:07,875 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-20 14:33:07,979 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-20 14:33:07,988 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-20 14:33:08,123 | INFO    | job_etl              | [usajobs] 'Product Analyst': 5 raw jobs
+2026-05-20 14:33:08,206 | INFO    | job_etl              | [jooble] 'Product Analyst': 20 raw jobs
+2026-05-20 14:33:08,236 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-20 14:33:08,277 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-20 14:33:08,337 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-20 14:33:08,422 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-20 14:33:08,526 | INFO    | job_etl              | [usajobs] 'Business Analyst': 5 raw jobs
+2026-05-20 14:33:08,552 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 20 raw jobs
+2026-05-20 14:33:08,570 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-20 14:33:08,642 | INFO    | job_etl              | [adzuna] 'Data Analyst': 50 raw jobs
+2026-05-20 14:33:08,673 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-20 14:33:08,708 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 5 raw jobs
+2026-05-20 14:33:08,922 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 5 raw jobs
+2026-05-20 14:33:08,927 | INFO    | job_etl              | [themuse] 'Business Analyst': 0 raw jobs
+2026-05-20 14:33:08,962 | INFO    | job_etl              | [jooble] 'Business Analyst': 20 raw jobs
+2026-05-20 14:33:08,993 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-20 14:33:09,141 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-20 14:33:09,141 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-20 14:33:09,219 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 14:33:09,241 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 5 raw jobs
+2026-05-20 14:33:09,310 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 20 raw jobs
+2026-05-20 14:33:09,429 | INFO    | job_etl              | [usajobs] 'Data Scientist': 5 raw jobs
+2026-05-20 14:33:09,431 | INFO    | job_etl              | [OK] [usajobs] returned 35 raw records
+2026-05-20 14:33:09,529 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-20 14:33:09,596 | INFO    | job_etl              | [adzuna] 'Product Analyst': 50 raw jobs
+2026-05-20 14:33:09,681 | INFO    | job_etl              | [jooble] 'Financial Analyst': 20 raw jobs
+2026-05-20 14:33:09,865 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-20 14:33:10,034 | INFO    | job_etl              | [jooble] 'Operation Analyst': 20 raw jobs
+2026-05-20 14:33:10,126 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-20 14:33:10,126 | INFO    | job_etl              | [OK] [themuse] returned 0 raw records
+2026-05-20 14:33:10,626 | INFO    | job_etl              | [jooble] 'Data Scientist': 20 raw jobs
+2026-05-20 14:33:10,626 | INFO    | job_etl              | [OK] [jooble] returned 160 raw records
+2026-05-20 14:33:12,289 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 50 raw jobs
+2026-05-20 14:33:13,119 | INFO    | job_etl              | [adzuna] 'Business Analyst': 50 raw jobs
+2026-05-20 14:33:14,120 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 50 raw jobs
+2026-05-20 14:33:14,451 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 14:33:14,654 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-20 14:33:14,844 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-20 14:33:15,074 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 50 raw jobs
+2026-05-20 14:33:17,810 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 50 raw jobs
+2026-05-20 14:33:20,047 | INFO    | job_etl              | [adzuna] 'Data Scientist': 50 raw jobs
+2026-05-20 14:33:20,048 | INFO    | job_etl              | [OK] [adzuna] returned 400 raw records
+2026-05-20 14:33:21,419 | ERROR   | job_etl              | [arbeitnow] page 2 'Data Scientist': 403 Client Error: Forbidden for url: https://www.arbeitnow.com/api/job-board-api?page=2
+2026-05-20 14:33:21,419 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-20 14:33:21,419 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-20 14:33:21,421 | INFO    | job_etl              | TOTAL RAW: 747 jobs across all APIs
+2026-05-20 15:00:32,636 | INFO    | job_etl              | [OK] Created table my-first-project-27273.data_job_market.us_job_data
+2026-05-20 15:00:34,746 | INFO    | job_etl              | Loaded 0 existing fingerprints
+2026-05-20 15:00:34,752 | INFO    | job_etl              | After cross-BQ dedup: 305 new rows
+2026-05-20 15:00:34,777 | INFO    | job_etl              | Emergency backup saved locally to emergency_backup.json
+2026-05-20 15:00:39,190 | INFO    | job_etl              | BQ LOAD COMPLETE — 305 rows inserted via Load Job.
+2026-05-20 15:00:39,191 | INFO    | job_etl              | ======================================================================
+2026-05-20 15:00:39,191 | INFO    | job_etl              |   PIPELINE COMPLETE in 1652.1s
+2026-05-20 15:00:39,191 | INFO    | job_etl              | ======================================================================
+2026-05-20 15:00:39,192 | INFO    | job_etl              | RAW BY API:
+2026-05-20 15:00:39,192 | INFO    | job_etl              |   raw_remotive: 152
+2026-05-20 15:00:39,192 | INFO    | job_etl              |   raw_usajobs: 35
+2026-05-20 15:00:39,193 | INFO    | job_etl              |   raw_themuse: 0
+2026-05-20 15:00:39,193 | INFO    | job_etl              |   raw_jooble: 160
+2026-05-20 15:00:39,193 | INFO    | job_etl              |   raw_adzuna: 400
+2026-05-20 15:00:39,194 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-20 15:00:39,194 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-20 15:00:39,194 | INFO    | job_etl              |   accepted_usajobs: 16
+2026-05-20 15:00:39,194 | INFO    | job_etl              |   accepted_jooble: 97
+2026-05-20 15:00:39,195 | INFO    | job_etl              |   accepted_adzuna: 192
+2026-05-20 15:00:39,195 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-20 15:00:39,196 | INFO    | job_etl              |   unrelated_job_title: 269
+2026-05-20 15:00:39,196 | INFO    | job_etl              |   no_us_state_identified: 131
+2026-05-20 15:00:39,196 | INFO    | job_etl              |   veto:paris: 7
+2026-05-20 15:00:39,196 | INFO    | job_etl              |   remote_no_us_marker: 3
+2026-05-20 15:00:39,197 | INFO    | job_etl              |   veto:india: 3
+2026-05-20 15:00:39,197 | INFO    | job_etl              |   veto:melbourne: 2
+2026-05-20 15:00:39,197 | INFO    | job_etl              |   veto:vienna: 1
+2026-05-20 15:00:39,198 | INFO    | job_etl              |   veto:mexico: 1
+2026-05-20 15:00:39,198 | INFO    | job_etl              | DUPLICATES SKIPPED: 17
+2026-05-20 15:00:39,199 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 37
+2026-05-20 15:10:14,485 | INFO    | job_etl              | ======================================================================
+2026-05-20 15:10:14,486 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.1 — STARTING
+2026-05-20 15:10:14,486 | INFO    | job_etl              | ======================================================================
+2026-05-20 15:10:14,856 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-20 15:10:14,953 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-20 15:10:15,063 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-20 15:10:15,177 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-20 15:10:15,245 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-20 15:10:15,679 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-20 15:10:15,736 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-20 15:10:15,790 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-20 15:10:15,832 | ERROR   | job_etl              | [arbeitnow] page 1 'Business Analyst': 'int' object is not subscriptable
+2026-05-20 15:10:15,832 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-20 15:10:15,960 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-20 15:10:16,007 | INFO    | job_etl              | [usajobs] 'Product Analyst': 6 raw jobs
+2026-05-20 15:10:16,150 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-20 15:10:16,152 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-20 15:10:16,369 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-20 15:10:16,535 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-20 15:10:16,536 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-20 15:10:17,062 | INFO    | job_etl              | [usajobs] 'Business Analyst': 92 raw jobs
+2026-05-20 15:10:17,297 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 10 raw jobs
+2026-05-20 15:10:17,993 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-20 15:10:18,254 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 15:10:18,532 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 49 raw jobs
+2026-05-20 15:10:18,601 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-20 15:10:19,100 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-20 15:10:19,139 | INFO    | job_etl              | [usajobs] 'Data Scientist': 74 raw jobs
+2026-05-20 15:10:19,140 | INFO    | job_etl              | [OK] [usajobs] returned 431 raw records
+2026-05-20 15:10:26,054 | ERROR   | job_etl              | [arbeitnow] page 2 'Data Scientist': 403 Client Error: Forbidden for url: https://www.arbeitnow.com/api/job-board-api?page=2
+2026-05-20 15:10:26,055 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-20 15:10:26,055 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-20 15:10:32,542 | INFO    | job_etl              | [jooble] 'Data Analyst': 1000 raw jobs
+2026-05-20 15:10:41,786 | INFO    | job_etl              | [adzuna] 'Data Analyst': 1000 raw jobs
+2026-05-20 15:10:46,553 | INFO    | job_etl              | [themuse] 'Data Analyst': 7 raw jobs
+2026-05-20 15:10:52,387 | INFO    | job_etl              | [jooble] 'Product Analyst': 1000 raw jobs
+2026-05-20 15:11:08,212 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-20 15:11:09,263 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 1000 raw jobs
+2026-05-20 15:11:14,869 | INFO    | job_etl              | [adzuna] 'Product Analyst': 843 raw jobs
+2026-05-20 15:11:25,333 | INFO    | job_etl              | [jooble] 'Business Analyst': 1000 raw jobs
+2026-05-20 15:11:28,275 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-20 15:11:34,687 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 644 raw jobs
+2026-05-20 15:11:41,178 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 1000 raw jobs
+2026-05-20 15:11:48,058 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-20 15:11:57,089 | INFO    | job_etl              | [jooble] 'Financial Analyst': 1000 raw jobs
+2026-05-20 15:11:59,412 | INFO    | job_etl              | [adzuna] 'Business Analyst': 1000 raw jobs
+2026-05-20 15:12:07,622 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-20 15:12:12,912 | INFO    | job_etl              | [jooble] 'Operation Analyst': 1000 raw jobs
+2026-05-20 15:12:13,099 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 405 raw jobs
+2026-05-20 15:12:26,863 | INFO    | job_etl              | [themuse] 'Financial Analyst': 3 raw jobs
+2026-05-20 15:12:30,126 | INFO    | job_etl              | [jooble] 'Data Scientist': 1000 raw jobs
+2026-05-20 15:12:30,127 | INFO    | job_etl              | [OK] [jooble] returned 8000 raw records
+2026-05-20 15:12:36,444 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 1000 raw jobs
+2026-05-20 15:12:45,379 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-20 15:13:06,908 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 1000 raw jobs
+2026-05-20 15:13:07,806 | INFO    | job_etl              | [themuse] 'Data Scientist': 2 raw jobs
+2026-05-20 15:13:07,807 | INFO    | job_etl              | [OK] [themuse] returned 13 raw records
+2026-05-20 15:13:26,951 | INFO    | job_etl              | [adzuna] 'Data Scientist': 1000 raw jobs
+2026-05-20 15:13:26,952 | INFO    | job_etl              | [OK] [adzuna] returned 6892 raw records
+2026-05-20 15:13:26,953 | INFO    | job_etl              | TOTAL RAW: 15488 jobs across all APIs
+2026-05-21 02:13:09,388 | INFO    | job_etl              | Loaded 305 existing fingerprints
+2026-05-21 02:13:09,485 | INFO    | job_etl              | After cross-BQ dedup: 4571 new rows
+2026-05-21 02:13:09,730 | INFO    | job_etl              | Emergency backup saved locally to emergency_backup.json
+2026-05-21 02:13:14,277 | INFO    | job_etl              | BQ LOAD COMPLETE — 4571 rows inserted via Load Job.
+2026-05-21 02:13:14,277 | INFO    | job_etl              | ======================================================================
+2026-05-21 02:13:14,278 | INFO    | job_etl              |   PIPELINE COMPLETE in 39779.8s
+2026-05-21 02:13:14,278 | INFO    | job_etl              | ======================================================================
+2026-05-21 02:13:14,279 | INFO    | job_etl              | RAW BY API:
+2026-05-21 02:13:14,279 | INFO    | job_etl              |   raw_remotive: 152
+2026-05-21 02:13:14,279 | INFO    | job_etl              |   raw_usajobs: 431
+2026-05-21 02:13:14,279 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-21 02:13:14,280 | INFO    | job_etl              |   raw_jooble: 8000
+2026-05-21 02:13:14,280 | INFO    | job_etl              |   raw_themuse: 13
+2026-05-21 02:13:14,280 | INFO    | job_etl              |   raw_adzuna: 6892
+2026-05-21 02:13:14,281 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-21 02:13:14,281 | INFO    | job_etl              |   accepted_usajobs: 25
+2026-05-21 02:13:14,281 | INFO    | job_etl              |   accepted_jooble: 2229
+2026-05-21 02:13:14,282 | INFO    | job_etl              |   accepted_themuse: 2
+2026-05-21 02:13:14,282 | INFO    | job_etl              |   accepted_adzuna: 2614
+2026-05-21 02:13:14,282 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-21 02:13:14,283 | INFO    | job_etl              |   unrelated_job_title: 6183
+2026-05-21 02:13:14,283 | INFO    | job_etl              |   no_us_state_identified: 2125
+2026-05-21 02:13:14,283 | INFO    | job_etl              |   remote_no_us_marker: 201
+2026-05-21 02:13:14,283 | INFO    | job_etl              |   veto:india: 75
+2026-05-21 02:13:14,284 | INFO    | job_etl              |   veto:paris: 69
+2026-05-21 02:13:14,284 | INFO    | job_etl              |   veto:mexico: 11
+2026-05-21 02:13:14,284 | INFO    | job_etl              |   veto:vienna: 7
+2026-05-21 02:13:14,285 | INFO    | job_etl              |   veto:melbourne: 7
+2026-05-21 02:13:14,285 | INFO    | job_etl              |   veto:vancouver: 6
+2026-05-21 02:13:14,285 | INFO    | job_etl              |   veto:russia: 5
+2026-05-21 02:13:14,286 | INFO    | job_etl              |   veto:athens: 5
+2026-05-21 02:13:14,286 | INFO    | job_etl              |   veto:warsaw: 3
+2026-05-21 02:13:14,286 | INFO    | job_etl              |   veto:milan: 3
+2026-05-21 02:13:14,286 | INFO    | job_etl              |   veto:london: 3
+2026-05-21 02:13:14,287 | INFO    | job_etl              |   veto:moscow: 3
+2026-05-21 02:13:14,287 | INFO    | job_etl              |   veto:brazil: 2
+2026-05-21 02:13:14,287 | INFO    | job_etl              |   veto:toronto: 1
+2026-05-21 02:13:14,287 | INFO    | job_etl              |   veto:oslo: 1
+2026-05-21 02:13:14,288 | INFO    | job_etl              |   veto:canada: 1
+2026-05-21 02:13:14,288 | INFO    | job_etl              |   veto:zurich: 1
+2026-05-21 02:13:14,288 | INFO    | job_etl              | DUPLICATES SKIPPED: 1654
+2026-05-21 02:13:14,289 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 419
