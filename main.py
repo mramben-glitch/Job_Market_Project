@@ -68,7 +68,7 @@ TARGET_ROLES = [
     "Data Scientist",
 ]
 
-RESULTS_PER_ROLE_PER_API = 1000
+RESULTS_PER_ROLE_PER_API = 100
 
 # ---- US Geographic Authority ------------------------------------------------
 US_STATES = {
