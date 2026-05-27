@@ -2,7 +2,9 @@ import os
 import time
 import logging
 import httpx
+import json  # Securely parses the service account JSON secret
 from google.cloud import bigquery
+from google.oauth2 import service_account  # Converts parsed JSON into active Google Credentials
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -21,14 +23,24 @@ DATASET_ID = "data_job_market"
 TABLE_NAME = "us_job_data"
 TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_NAME}"
 
-# Initialize Google Cloud Clients
+# Initialize Google Cloud Clients with explicit Service Account verification
 try:
-    bq_client = bigquery.Client(project=PROJECT_ID)
-    log.info("Authenticated BigQuery via GitHub Secret Token.")
+    sa_key_env = os.getenv("GCP_SA_KEY_JSON")
+    if sa_key_env:
+        # Running in GitHub Actions: parse the secret JSON string directly
+        info = json.loads(sa_key_env)
+        credentials = service_account.Credentials.from_service_account_info(info)
+        bq_client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
+    else:
+        # Local Desktop Testing: fallback to default environmental tokens (ADC)
+        bq_client = bigquery.Client(project=PROJECT_ID)
+        
+    log.info("Authenticated BigQuery via Secure Token.")
 except Exception as e:
     log.error(f"Failed to initialize BigQuery client: {e}")
     raise
 
+# Initialize Gemini Client
 ai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def calculate_completeness(job):
@@ -65,7 +77,7 @@ def process_single_job_with_retry(job):
     - salary_max (float or null)
 
     Job Description:
-    {raw_description}
+    {{raw_description}}
     """
 
     try:
@@ -77,11 +89,10 @@ def process_single_job_with_retry(job):
             )
         )
         
-        # Parse output data directly from the schema format response
-        import json
+        # Parse output data directly from the structured schema JSON
         structured_data = json.loads(response.text)
         
-        # Inject core tracking metadata from original payload
+        # Inject tracking metadata from original payload
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
         structured_data["job_apply_link"] = job.get("job_apply_link")
@@ -93,13 +104,13 @@ def process_single_job_with_retry(job):
             log.warning("Gemini API Free Rate Limit spiked. Shifting row into raw fallback state.")
             return None, "exhausted_raw"
         
-        log.warning(f"Failed to enrich job {job.get('job_id')}: {gemini_err}")
+        log.warning(f"Failed to enrich job {{job.get('job_id')}}: {{gemini_err}}")
         return None, "fallback_raw"
 
 def main():
     start_time = time.time()
     
-    # BUDGET TRACKS: Exactly 5 niche keywords based on your data core preferences
+    # BUDGET TRACKS: Exactly 5 targeted tracks to maximize our free RapidAPI tier metrics
     queries = [
         "Data Analyst or Product Analyst in USA",
         "Business Intelligence Analyst in USA",
@@ -135,7 +146,7 @@ def main():
                     if response.status_code == 200:
                         job_data_list = response.json().get("data", [])
                         
-                        # Break early if a deep page returns completely empty array
+                        # Break early if a deep pagination tier naturally runs completely empty
                         if not job_data_list:
                             break
                             
@@ -155,17 +166,17 @@ def main():
                                 if incoming_score > current_score:
                                     deduplicated_jobs[dedup_tuple] = job
                     
-                    # Short sleep between pagination loops to respect JSearch rate limits
+                    # Prevent rapid hammering of JSearch page tiers
                     time.sleep(1.2)
                     
                 except Exception as e:
-                    log.warning(f"API download path anomaly on track '{q}' Page {page_num}: {e}")
-                    # Skip to the next query track if the current one begins timing out
+                    log.warning(f"API download path anomaly on track '{{q}}' Page {{page_num}}: {{e}}")
+                    # Escape current track if timeouts or server exceptions interrupt connection
                     break
 
     job_list = list(deduplicated_jobs.values())
     total_to_process = len(job_list)
-    log.info(f"Deduplication step completed. Processing {total_to_process} unique items sequentially...")
+    log.info(f"Deduplication step completed. Processing {{total_to_process}} unique items sequentially...")
 
     buffer = []
     consecutive_exhaustions = 0
@@ -183,12 +194,12 @@ def main():
         else:
             consecutive_exhaustions = 0
 
-        # Safety valve: Kill execution if Gemini throws continuous limits
+        # Safety loop breakout if Gemini tier errors repeatedly cascade
         if consecutive_exhaustions >= 3:
             log.critical("Consecutive rate limits exhausted. Aborting loop processing early to safeguard data logs.")
             break
 
-    # Bulk load chunking strategy to cleanly ingest into BigQuery
+    # Bulk load chunking strategy to cleanly ingest rows into BigQuery tables
     if buffer:
         chunk_size = 50
         for i in range(0, len(buffer), chunk_size):
@@ -199,10 +210,10 @@ def main():
                 load_job.result()
                 metrics["loaded"] += len(chunk)
             except Exception as bq_err:
-                log.error(f"BigQuery validation rejection on batch window {i}-{i+chunk_size}: {bq_err}")
+                log.error(f"BigQuery validation rejection on batch window {{i}}-{{i+chunk_size}}: {{bq_err}}")
 
     elapsed = int(time.time() - start_time)
-    summary_string = f"METRICS_SUMMARY: harvested={metrics['harvested']}, unique={total_to_process}, enriched={metrics['enriched']}, fallback={metrics['fallback_raw']}, exhausted={metrics['exhausted_raw']}, loaded={metrics['loaded']}, runtime_seconds={elapsed}"
+    summary_string = f"METRICS_SUMMARY: harvested={{metrics['harvested']}}, unique={{total_to_process}}, enriched={{metrics['enriched']}}, fallback={{metrics['fallback_raw']}}, exhausted={{metrics['exhausted_raw']}}, loaded={{metrics['loaded']}}, runtime_seconds={{elapsed}}"
     print(summary_string)
     log.info(summary_string)
 
