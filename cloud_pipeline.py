@@ -77,7 +77,7 @@ def process_single_job_with_retry(job):
     - salary_max (float or null)
 
     Job Description:
-    {{raw_description}}
+    {raw_description}
     """
 
     try:
@@ -104,7 +104,7 @@ def process_single_job_with_retry(job):
             log.warning("Gemini API Free Rate Limit spiked. Shifting row into raw fallback state.")
             return None, "exhausted_raw"
         
-        log.warning(f"Failed to enrich job {{job.get('job_id')}}: {{gemini_err}}")
+        log.warning(f"Failed to enrich job {job.get('job_id')}: {gemini_err}")
         return None, "fallback_raw"
 
 def main():
@@ -170,13 +170,13 @@ def main():
                     time.sleep(1.2)
                     
                 except Exception as e:
-                    log.warning(f"API download path anomaly on track '{{q}}' Page {{page_num}}: {{e}}")
+                    log.warning(f"API download path anomaly on track '{q}' Page {page_num}: {e}")
                     # Escape current track if timeouts or server exceptions interrupt connection
                     break
 
     job_list = list(deduplicated_jobs.values())
     total_to_process = len(job_list)
-    log.info(f"Deduplication step completed. Processing {{total_to_process}} unique items sequentially...")
+    log.info(f"Deduplication step completed. Processing {total_to_process} unique items sequentially...")
 
     buffer = []
     consecutive_exhaustions = 0
@@ -210,10 +210,10 @@ def main():
                 load_job.result()
                 metrics["loaded"] += len(chunk)
             except Exception as bq_err:
-                log.error(f"BigQuery validation rejection on batch window {{i}}-{{i+chunk_size}}: {{bq_err}}")
+                log.error(f"BigQuery validation rejection on batch window {i}-{i+chunk_size}: {bq_err}")
 
     elapsed = int(time.time() - start_time)
-    summary_string = f"METRICS_SUMMARY: harvested={{metrics['harvested']}}, unique={{total_to_process}}, enriched={{metrics['enriched']}}, fallback={{metrics['fallback_raw']}}, exhausted={{metrics['exhausted_raw']}}, loaded={{metrics['loaded']}}, runtime_seconds={{elapsed}}"
+    summary_string = f"METRICS_SUMMARY: harvested={metrics['harvested']}, unique={total_to_process}, enriched={metrics['enriched']}, fallback={metrics['fallback_raw']}, exhausted={metrics['exhausted_raw']}, loaded={metrics['loaded']}, runtime_seconds={elapsed}"
     print(summary_string)
     log.info(summary_string)
 
