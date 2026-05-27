@@ -2,9 +2,10 @@ import os
 import time
 import logging
 import httpx
-import json  # Securely parses the service account JSON secret
+import json
+import base64  # Handles the secure Base64 conversion
 from google.cloud import bigquery
-from google.oauth2 import service_account  # Converts parsed JSON into active Google Credentials
+from google.oauth2 import service_account
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -23,19 +24,20 @@ DATASET_ID = "data_job_market"
 TABLE_NAME = "us_job_data"
 TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_NAME}"
 
-# Initialize Google Cloud Clients with explicit Service Account verification
+# Initialize Google Cloud Clients with bulletproof Base64 Decoding
 try:
-    sa_key_env = os.getenv("GCP_SA_KEY_JSON")
-    if sa_key_env:
-        # Running in GitHub Actions: parse the secret JSON string directly
-        info = json.loads(sa_key_env)
+    sa_key_b64 = os.getenv("GCP_SA_KEY_B64")
+    if sa_key_b64:
+        # Decode the uncorruptible base64 key string back into raw JSON strings
+        raw_json_bytes = base64.b64decode(sa_key_b64)
+        info = json.loads(raw_json_bytes.decode("utf-8"))
         credentials = service_account.Credentials.from_service_account_info(info)
         bq_client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
     else:
-        # Local Desktop Testing: fallback to default environmental tokens (ADC)
+        # Local Desktop Testing fallback
         bq_client = bigquery.Client(project=PROJECT_ID)
         
-    log.info("Authenticated BigQuery via Secure Token.")
+    log.info("Authenticated BigQuery via Secure Base64 Token.")
 except Exception as e:
     log.error(f"Failed to initialize BigQuery client: {e}")
     raise
@@ -44,7 +46,6 @@ except Exception as e:
 ai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def calculate_completeness(job):
-    """Calculates a primitive score based on field presence to assist deduplication."""
     score = 0
     fields_to_check = ["job_description", "job_salary", "job_highlights", "job_required_skills"]
     for field in fields_to_check:
@@ -53,12 +54,8 @@ def calculate_completeness(job):
     return score
 
 def process_single_job_with_retry(job):
-    """
-    Sends the job data to Gemini 2.5 Flash for data enrichment.
-    Maintains a 4.5s delay to stay entirely inside the 15 RPM Free Tier.
-    """
-    # Hard throttling shield for Gemini Free Tier (Max 15 Requests Per Minute)
-    time.sleep(4.5)
+    # Safe 6.0s throttle cushion for Gemini Free Tier
+    time.sleep(6.0)
     
     raw_description = job.get("job_description", "")
     if not raw_description:
@@ -89,10 +86,7 @@ def process_single_job_with_retry(job):
             )
         )
         
-        # Parse output data directly from the structured schema JSON
         structured_data = json.loads(response.text)
-        
-        # Inject tracking metadata from original payload
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
         structured_data["job_apply_link"] = job.get("job_apply_link")
@@ -110,7 +104,6 @@ def process_single_job_with_retry(job):
 def main():
     start_time = time.time()
     
-    # BUDGET TRACKS: Exactly 5 targeted tracks to maximize our free RapidAPI tier metrics
     queries = [
         "Data Analyst or Product Analyst in USA",
         "Business Intelligence Analyst in USA",
@@ -131,7 +124,6 @@ def main():
 
     with httpx.Client() as client:
         for q in queries:
-            # REAL PAGINATION LOOP: Iterates from page 1 to page 5 sequentially (25 total API hits)
             for page_num in range(1, 6):
                 try:
                     params = {
@@ -145,8 +137,6 @@ def main():
                     
                     if response.status_code == 200:
                         job_data_list = response.json().get("data", [])
-                        
-                        # Break early if a deep pagination tier naturally runs completely empty
                         if not job_data_list:
                             break
                             
@@ -166,12 +156,10 @@ def main():
                                 if incoming_score > current_score:
                                     deduplicated_jobs[dedup_tuple] = job
                     
-                    # Prevent rapid hammering of JSearch page tiers
                     time.sleep(1.2)
                     
                 except Exception as e:
                     log.warning(f"API download path anomaly on track '{q}' Page {page_num}: {e}")
-                    # Escape current track if timeouts or server exceptions interrupt connection
                     break
 
     job_list = list(deduplicated_jobs.values())
@@ -194,12 +182,11 @@ def main():
         else:
             consecutive_exhaustions = 0
 
-        # Safety loop breakout if Gemini tier errors repeatedly cascade
         if consecutive_exhaustions >= 3:
             log.critical("Consecutive rate limits exhausted. Aborting loop processing early to safeguard data logs.")
             break
 
-    # Bulk load chunking strategy to cleanly ingest rows into BigQuery tables
+    # Bulk load chunking strategy
     if buffer:
         chunk_size = 50
         for i in range(0, len(buffer), chunk_size):
