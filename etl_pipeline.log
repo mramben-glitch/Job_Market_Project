@@ -807,3 +807,534 @@ Job ID: 70f233bd-9c65-4861-ba60-f46c6dca8ba8
 2026-05-21 02:13:14,288 | INFO    | job_etl              |   veto:zurich: 1
 2026-05-21 02:13:14,288 | INFO    | job_etl              | DUPLICATES SKIPPED: 1654
 2026-05-21 02:13:14,289 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 419
+2026-05-21 22:51:13,781 | INFO    | job_etl              | ======================================================================
+2026-05-21 22:51:13,781 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.2 (STRICT SCHEMA) — STARTING
+2026-05-21 22:51:13,781 | INFO    | job_etl              | ======================================================================
+2026-05-21 22:51:14,114 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-21 22:51:14,181 | INFO    | job_etl              | [remotive] 'Data Analyst': 20 raw jobs
+2026-05-21 22:51:14,203 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-21 22:51:14,456 | INFO    | job_etl              | [remotive] 'Product Analyst': 20 raw jobs
+2026-05-21 22:51:14,690 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 20 raw jobs
+2026-05-21 22:51:14,699 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-21 22:51:14,820 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-21 22:51:15,003 | INFO    | job_etl              | [remotive] 'Business Analyst': 20 raw jobs
+2026-05-21 22:51:15,123 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-21 22:51:15,275 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 20 raw jobs
+2026-05-21 22:51:15,443 | INFO    | job_etl              | [remotive] 'Financial Analyst': 20 raw jobs
+2026-05-21 22:51:15,681 | INFO    | job_etl              | [remotive] 'Operation Analyst': 20 raw jobs
+2026-05-21 22:51:15,875 | INFO    | job_etl              | [remotive] 'Data Scientist': 20 raw jobs
+2026-05-21 22:51:15,876 | INFO    | job_etl              | [OK] [remotive] returned 160 raw records
+2026-05-21 22:51:15,906 | INFO    | job_etl              | [jooble] 'Data Analyst': 100 raw jobs
+2026-05-21 22:51:16,321 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-21 22:51:16,823 | INFO    | job_etl              | [adzuna] 'Data Analyst': 100 raw jobs
+2026-05-21 22:51:17,432 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-21 22:51:17,790 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-21 22:51:17,820 | INFO    | job_etl              | [jooble] 'Product Analyst': 100 raw jobs
+2026-05-21 22:51:17,868 | INFO    | job_etl              | [usajobs] 'Product Analyst': 9 raw jobs
+2026-05-21 22:51:18,038 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 0 raw jobs
+2026-05-21 22:51:18,161 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-21 22:51:18,746 | INFO    | job_etl              | [adzuna] 'Product Analyst': 100 raw jobs
+2026-05-21 22:51:19,114 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-21 22:51:19,323 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-21 22:51:19,323 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-21 22:51:19,908 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 100 raw jobs
+2026-05-21 22:51:20,578 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 100 raw jobs
+2026-05-21 22:51:21,185 | INFO    | job_etl              | [usajobs] 'Business Analyst': 96 raw jobs
+2026-05-21 22:51:21,385 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-21 22:51:21,606 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 8 raw jobs
+2026-05-21 22:51:21,897 | INFO    | job_etl              | [jooble] 'Business Analyst': 100 raw jobs
+2026-05-21 22:51:22,978 | INFO    | job_etl              | [adzuna] 'Business Analyst': 100 raw jobs
+2026-05-21 22:51:23,336 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-21 22:51:23,687 | INFO    | job_etl              | [themuse] 'Business Analyst': 1 raw jobs
+2026-05-21 22:51:23,892 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-21 22:51:24,288 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 57 raw jobs
+2026-05-21 22:51:24,950 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-21 22:51:25,415 | INFO    | job_etl              | [usajobs] 'Data Scientist': 75 raw jobs
+2026-05-21 22:51:25,416 | INFO    | job_etl              | [OK] [usajobs] returned 445 raw records
+2026-05-21 22:51:25,528 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-21 22:51:25,569 | INFO    | job_etl              | [jooble] 'Financial Analyst': 100 raw jobs
+2026-05-21 22:51:26,749 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 100 raw jobs
+2026-05-21 22:51:27,113 | INFO    | job_etl              | [jooble] 'Operation Analyst': 100 raw jobs
+2026-05-21 22:51:27,504 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-21 22:51:28,525 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 100 raw jobs
+2026-05-21 22:51:28,640 | INFO    | job_etl              | [jooble] 'Data Scientist': 100 raw jobs
+2026-05-21 22:51:28,640 | INFO    | job_etl              | [OK] [jooble] returned 800 raw records
+2026-05-21 22:51:29,301 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-21 22:51:30,412 | INFO    | job_etl              | [adzuna] 'Data Scientist': 100 raw jobs
+2026-05-21 22:51:30,412 | INFO    | job_etl              | [OK] [adzuna] returned 800 raw records
+2026-05-21 22:51:30,977 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-21 22:51:30,978 | INFO    | job_etl              | [OK] [themuse] returned 1 raw records
+2026-05-21 22:51:30,981 | INFO    | job_etl              | TOTAL RAW: 2206 jobs across all APIs
+2026-05-21 23:47:15,498 | INFO    | job_etl              | Sending 664 jobs to Strict BigQuery Loader...
+2026-05-22 16:45:53,005 | INFO    | job_etl              | ======================================================================
+2026-05-22 16:45:53,006 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.2 (STRICT SCHEMA) — STARTING
+2026-05-22 16:45:53,006 | INFO    | job_etl              | ======================================================================
+2026-05-22 16:45:53,333 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-22 16:45:53,669 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-22 16:45:53,929 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-22 16:45:53,979 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-22 16:45:54,141 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-22 16:45:54,307 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-22 16:45:54,415 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-22 16:45:54,606 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-22 16:45:54,633 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-22 16:45:54,841 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-22 16:45:54,852 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-22 16:45:55,119 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-22 16:45:55,120 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-22 16:45:55,172 | INFO    | job_etl              | [jooble] 'Data Analyst': 100 raw jobs
+2026-05-22 16:45:55,454 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-22 16:45:56,145 | INFO    | job_etl              | [adzuna] 'Data Analyst': 100 raw jobs
+2026-05-22 16:45:56,724 | INFO    | job_etl              | [jooble] 'Product Analyst': 100 raw jobs
+2026-05-22 16:45:57,246 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-22 16:45:57,458 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 16:45:57,889 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-22 16:45:58,345 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-22 16:45:58,670 | INFO    | job_etl              | [adzuna] 'Product Analyst': 100 raw jobs
+2026-05-22 16:45:58,998 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 100 raw jobs
+2026-05-22 16:45:59,283 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-22 16:46:00,805 | INFO    | job_etl              | [jooble] 'Business Analyst': 100 raw jobs
+2026-05-22 16:46:00,896 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-22 16:46:00,897 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-22 16:46:01,576 | INFO    | job_etl              | [themuse] 'Business Analyst': 2 raw jobs
+2026-05-22 16:46:01,730 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 100 raw jobs
+2026-05-22 16:46:02,392 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 16:46:04,368 | INFO    | job_etl              | [jooble] 'Financial Analyst': 100 raw jobs
+2026-05-22 16:46:04,428 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 16:46:04,918 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-22 16:46:05,145 | INFO    | job_etl              | [usajobs] 'Product Analyst': 7 raw jobs
+2026-05-22 16:46:05,352 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 2 raw jobs
+2026-05-22 16:46:05,785 | INFO    | job_etl              | [adzuna] 'Business Analyst': 100 raw jobs
+2026-05-22 16:46:06,608 | INFO    | job_etl              | [jooble] 'Operation Analyst': 100 raw jobs
+2026-05-22 16:46:06,854 | INFO    | job_etl              | [usajobs] 'Business Analyst': 89 raw jobs
+2026-05-22 16:46:06,909 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-22 16:46:07,070 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 6 raw jobs
+2026-05-22 16:46:08,234 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-22 16:46:08,248 | INFO    | job_etl              | [jooble] 'Data Scientist': 100 raw jobs
+2026-05-22 16:46:08,248 | INFO    | job_etl              | [OK] [jooble] returned 800 raw records
+2026-05-22 16:46:08,361 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 16:46:08,834 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 56 raw jobs
+2026-05-22 16:46:09,477 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-22 16:46:09,494 | INFO    | job_etl              | [usajobs] 'Data Scientist': 68 raw jobs
+2026-05-22 16:46:09,497 | INFO    | job_etl              | [OK] [usajobs] returned 428 raw records
+2026-05-22 16:46:10,756 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 100 raw jobs
+2026-05-22 16:46:11,742 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-22 16:46:11,743 | INFO    | job_etl              | [OK] [themuse] returned 2 raw records
+2026-05-22 16:46:13,932 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 100 raw jobs
+2026-05-22 16:46:16,255 | INFO    | job_etl              | [adzuna] 'Data Scientist': 100 raw jobs
+2026-05-22 16:46:16,255 | INFO    | job_etl              | [OK] [adzuna] returned 800 raw records
+2026-05-22 16:46:16,265 | INFO    | job_etl              | TOTAL RAW: 2182 jobs across all APIs
+2026-05-22 17:41:55,955 | INFO    | job_etl              | Sending 659 jobs to Strict BigQuery Loader...
+2026-05-22 18:59:48,764 | INFO    | job_etl              | ======================================================================
+2026-05-22 18:59:48,764 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.2 (STRICT SCHEMA) — STARTING
+2026-05-22 18:59:48,765 | INFO    | job_etl              | ======================================================================
+2026-05-22 18:59:48,993 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-22 18:59:49,127 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-22 18:59:49,263 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-22 18:59:49,408 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-22 18:59:49,591 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-22 18:59:49,601 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-22 18:59:49,724 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-22 18:59:49,909 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-22 18:59:50,028 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-22 18:59:50,104 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-22 18:59:50,104 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-22 18:59:50,479 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-22 18:59:50,994 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-22 18:59:51,248 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-22 18:59:51,297 | INFO    | job_etl              | [jooble] 'Data Analyst': 100 raw jobs
+2026-05-22 18:59:51,461 | INFO    | job_etl              | [adzuna] 'Data Analyst': 100 raw jobs
+2026-05-22 18:59:52,611 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-22 18:59:52,876 | INFO    | job_etl              | [usajobs] 'Product Analyst': 7 raw jobs
+2026-05-22 18:59:52,931 | INFO    | job_etl              | [jooble] 'Product Analyst': 100 raw jobs
+2026-05-22 18:59:53,058 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 2 raw jobs
+2026-05-22 18:59:53,213 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-22 18:59:53,457 | INFO    | job_etl              | [adzuna] 'Product Analyst': 100 raw jobs
+2026-05-22 18:59:54,493 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 18:59:54,633 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 100 raw jobs
+2026-05-22 18:59:55,128 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 100 raw jobs
+2026-05-22 18:59:55,262 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-22 18:59:55,314 | INFO    | job_etl              | [usajobs] 'Business Analyst': 92 raw jobs
+2026-05-22 18:59:55,530 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-22 18:59:55,589 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 6 raw jobs
+2026-05-22 18:59:55,712 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-22 18:59:56,641 | INFO    | job_etl              | [jooble] 'Business Analyst': 100 raw jobs
+2026-05-22 18:59:56,966 | INFO    | job_etl              | [adzuna] 'Business Analyst': 100 raw jobs
+2026-05-22 18:59:57,375 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-22 18:59:57,654 | INFO    | job_etl              | [themuse] 'Business Analyst': 2 raw jobs
+2026-05-22 18:59:58,394 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 18:59:58,394 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 57 raw jobs
+2026-05-22 18:59:59,014 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 18:59:59,562 | INFO    | job_etl              | [usajobs] 'Data Scientist': 68 raw jobs
+2026-05-22 18:59:59,562 | INFO    | job_etl              | [OK] [usajobs] returned 432 raw records
+2026-05-22 18:59:59,696 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 19:00:00,176 | INFO    | job_etl              | [jooble] 'Financial Analyst': 100 raw jobs
+2026-05-22 19:00:01,764 | INFO    | job_etl              | [jooble] 'Operation Analyst': 100 raw jobs
+2026-05-22 19:00:01,970 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-22 19:00:02,640 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-22 19:00:02,640 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-22 19:00:03,427 | INFO    | job_etl              | [jooble] 'Data Scientist': 100 raw jobs
+2026-05-22 19:00:03,428 | INFO    | job_etl              | [OK] [jooble] returned 800 raw records
+2026-05-22 19:00:03,719 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-22 19:00:06,493 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-22 19:00:06,494 | INFO    | job_etl              | [OK] [themuse] returned 2 raw records
+2026-05-22 19:00:17,371 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 100 raw jobs
+2026-05-22 19:00:26,494 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 100 raw jobs
+2026-05-22 19:00:33,033 | INFO    | job_etl              | [adzuna] 'Data Scientist': 100 raw jobs
+2026-05-22 19:00:33,033 | INFO    | job_etl              | [OK] [adzuna] returned 800 raw records
+2026-05-22 19:00:33,034 | INFO    | job_etl              | TOTAL RAW: 2186 jobs across all APIs
+2026-05-22 19:55:51,704 | INFO    | job_etl              | Sending 664 jobs to Strict BigQuery Loader...
+2026-05-22 20:02:51,833 | INFO    | job_etl              | ======================================================================
+2026-05-22 20:02:51,834 | INFO    | job_etl              |   ULTIMATE US JOB ETL PIPELINE v1.2 (STRICT SCHEMA) — STARTING
+2026-05-22 20:02:51,834 | INFO    | job_etl              | ======================================================================
+2026-05-22 20:02:52,373 | INFO    | job_etl              | [remotive] 'Data Analyst': 19 raw jobs
+2026-05-22 20:02:53,323 | INFO    | job_etl              | [remotive] 'Product Analyst': 19 raw jobs
+2026-05-22 20:02:54,069 | INFO    | job_etl              | [remotive] 'Marketing Analyst': 19 raw jobs
+2026-05-22 20:02:55,499 | INFO    | job_etl              | [jooble] 'Data Analyst': 100 raw jobs
+2026-05-22 20:02:55,560 | INFO    | job_etl              | [remotive] 'Business Analyst': 19 raw jobs
+2026-05-22 20:02:55,676 | INFO    | job_etl              | [arbeitnow] 'Data Analyst': 0 raw jobs
+2026-05-22 20:02:55,825 | INFO    | job_etl              | [themuse] 'Data Analyst': 0 raw jobs
+2026-05-22 20:02:56,258 | INFO    | job_etl              | [remotive] 'Business Intelligence Analyst': 19 raw jobs
+2026-05-22 20:02:56,781 | INFO    | job_etl              | [remotive] 'Financial Analyst': 19 raw jobs
+2026-05-22 20:02:57,389 | INFO    | job_etl              | [arbeitnow] 'Product Analyst': 0 raw jobs
+2026-05-22 20:02:57,444 | INFO    | job_etl              | [remotive] 'Operation Analyst': 19 raw jobs
+2026-05-22 20:02:57,760 | INFO    | job_etl              | [remotive] 'Data Scientist': 19 raw jobs
+2026-05-22 20:02:57,761 | INFO    | job_etl              | [OK] [remotive] returned 152 raw records
+2026-05-22 20:02:57,833 | INFO    | job_etl              | [jooble] 'Product Analyst': 100 raw jobs
+2026-05-22 20:02:58,501 | INFO    | job_etl              | [themuse] 'Product Analyst': 0 raw jobs
+2026-05-22 20:02:58,823 | INFO    | job_etl              | [adzuna] 'Data Analyst': 100 raw jobs
+2026-05-22 20:02:59,089 | INFO    | job_etl              | [arbeitnow] 'Marketing Analyst': 0 raw jobs
+2026-05-22 20:02:59,450 | INFO    | job_etl              | [arbeitnow] 'Business Analyst': 0 raw jobs
+2026-05-22 20:02:59,786 | INFO    | job_etl              | [jooble] 'Marketing Analyst': 100 raw jobs
+2026-05-22 20:03:00,554 | INFO    | job_etl              | [themuse] 'Marketing Analyst': 0 raw jobs
+2026-05-22 20:03:01,666 | INFO    | job_etl              | [jooble] 'Business Analyst': 100 raw jobs
+2026-05-22 20:03:02,821 | INFO    | job_etl              | [arbeitnow] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 20:03:03,569 | INFO    | job_etl              | [usajobs] 'Data Analyst': 100 raw jobs
+2026-05-22 20:03:03,897 | INFO    | job_etl              | [themuse] 'Business Analyst': 2 raw jobs
+2026-05-22 20:03:04,104 | INFO    | job_etl              | [jooble] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 20:03:04,708 | INFO    | job_etl              | [usajobs] 'Product Analyst': 7 raw jobs
+2026-05-22 20:03:04,805 | INFO    | job_etl              | [arbeitnow] 'Financial Analyst': 0 raw jobs
+2026-05-22 20:03:05,480 | INFO    | job_etl              | [usajobs] 'Marketing Analyst': 2 raw jobs
+2026-05-22 20:03:05,518 | INFO    | job_etl              | [adzuna] 'Product Analyst': 100 raw jobs
+2026-05-22 20:03:06,301 | INFO    | job_etl              | [arbeitnow] 'Operation Analyst': 0 raw jobs
+2026-05-22 20:03:06,319 | INFO    | job_etl              | [jooble] 'Financial Analyst': 100 raw jobs
+2026-05-22 20:03:06,798 | INFO    | job_etl              | [themuse] 'Business Intelligence Analyst': 0 raw jobs
+2026-05-22 20:03:07,092 | INFO    | job_etl              | [arbeitnow] 'Data Scientist': 0 raw jobs
+2026-05-22 20:03:07,093 | INFO    | job_etl              | [OK] [arbeitnow] returned 0 raw records
+2026-05-22 20:03:08,040 | INFO    | job_etl              | [jooble] 'Operation Analyst': 100 raw jobs
+2026-05-22 20:03:09,028 | INFO    | job_etl              | [themuse] 'Financial Analyst': 0 raw jobs
+2026-05-22 20:03:09,196 | INFO    | job_etl              | [usajobs] 'Business Analyst': 95 raw jobs
+2026-05-22 20:03:09,490 | INFO    | job_etl              | [usajobs] 'Business Intelligence Analyst': 6 raw jobs
+2026-05-22 20:03:09,547 | INFO    | job_etl              | [adzuna] 'Marketing Analyst': 100 raw jobs
+2026-05-22 20:03:09,832 | INFO    | job_etl              | [jooble] 'Data Scientist': 100 raw jobs
+2026-05-22 20:03:09,833 | INFO    | job_etl              | [OK] [jooble] returned 800 raw records
+2026-05-22 20:03:11,916 | INFO    | job_etl              | [themuse] 'Operation Analyst': 0 raw jobs
+2026-05-22 20:03:11,983 | INFO    | job_etl              | [usajobs] 'Financial Analyst': 100 raw jobs
+2026-05-22 20:03:13,428 | INFO    | job_etl              | [usajobs] 'Operation Analyst': 57 raw jobs
+2026-05-22 20:03:13,697 | INFO    | job_etl              | [adzuna] 'Business Analyst': 100 raw jobs
+2026-05-22 20:03:14,768 | INFO    | job_etl              | [themuse] 'Data Scientist': 0 raw jobs
+2026-05-22 20:03:14,769 | INFO    | job_etl              | [OK] [themuse] returned 2 raw records
+2026-05-22 20:03:15,801 | INFO    | job_etl              | [usajobs] 'Data Scientist': 68 raw jobs
+2026-05-22 20:03:15,802 | INFO    | job_etl              | [OK] [usajobs] returned 435 raw records
+2026-05-22 20:03:17,054 | INFO    | job_etl              | [adzuna] 'Business Intelligence Analyst': 100 raw jobs
+2026-05-22 20:03:20,992 | INFO    | job_etl              | [adzuna] 'Financial Analyst': 100 raw jobs
+2026-05-22 20:03:24,282 | INFO    | job_etl              | [adzuna] 'Operation Analyst': 100 raw jobs
+2026-05-22 20:03:26,625 | INFO    | job_etl              | [adzuna] 'Data Scientist': 100 raw jobs
+2026-05-22 20:03:26,626 | INFO    | job_etl              | [OK] [adzuna] returned 800 raw records
+2026-05-22 20:03:26,628 | INFO    | job_etl              | TOTAL RAW: 2189 jobs across all APIs
+2026-05-22 20:52:55,062 | INFO    | job_etl              | Sending 594 jobs to Strict BigQuery Loader...
+2026-05-22 20:53:03,074 | INFO    | job_etl              | ======================================================================
+2026-05-22 20:53:03,075 | INFO    | job_etl              |   PIPELINE COMPLETE in 3011.2s
+2026-05-22 20:53:03,075 | INFO    | job_etl              | ======================================================================
+2026-05-22 20:53:03,075 | INFO    | job_etl              | RAW BY API:
+2026-05-22 20:53:03,076 | INFO    | job_etl              |   raw_remotive: 152
+2026-05-22 20:53:03,076 | INFO    | job_etl              |   raw_arbeitnow: 0
+2026-05-22 20:53:03,077 | INFO    | job_etl              |   raw_jooble: 800
+2026-05-22 20:53:03,077 | INFO    | job_etl              |   raw_themuse: 2
+2026-05-22 20:53:03,077 | INFO    | job_etl              |   raw_usajobs: 435
+2026-05-22 20:53:03,077 | INFO    | job_etl              |   raw_adzuna: 800
+2026-05-22 20:53:03,078 | INFO    | job_etl              | ACCEPTED BY API:
+2026-05-22 20:53:03,078 | INFO    | job_etl              |   accepted_jooble: 257
+2026-05-22 20:53:03,078 | INFO    | job_etl              |   accepted_themuse: 1
+2026-05-22 20:53:03,079 | INFO    | job_etl              |   accepted_usajobs: 24
+2026-05-22 20:53:03,079 | INFO    | job_etl              |   accepted_adzuna: 312
+2026-05-22 20:53:03,079 | INFO    | job_etl              | REJECTION REASONS:
+2026-05-22 20:53:03,079 | INFO    | job_etl              |   unrelated_job_title: 1119
+2026-05-22 20:53:03,080 | INFO    | job_etl              |   no_us_state_identified: 357
+2026-05-22 20:53:03,080 | INFO    | job_etl              |   remote_no_us_marker: 25
+2026-05-22 20:53:03,080 | INFO    | job_etl              |   veto:paris: 8
+2026-05-22 20:53:03,081 | INFO    | job_etl              |   veto:vienna: 4
+2026-05-22 20:53:03,081 | INFO    | job_etl              |   veto:india: 3
+2026-05-22 20:53:03,081 | INFO    | job_etl              |   veto:vancouver: 2
+2026-05-22 20:53:03,081 | INFO    | job_etl              |   veto:poland: 1
+2026-05-22 20:53:03,082 | INFO    | job_etl              |   veto:milan: 1
+2026-05-22 20:53:03,082 | INFO    | job_etl              |   veto:zurich: 1
+2026-05-22 20:53:03,082 | INFO    | job_etl              |   veto:melbourne: 1
+2026-05-22 20:53:03,082 | INFO    | job_etl              |   veto:athens: 1
+2026-05-22 20:53:03,083 | INFO    | job_etl              |   veto:berlin: 1
+2026-05-22 20:53:03,083 | INFO    | job_etl              | DUPLICATES SKIPPED: 50
+2026-05-22 20:53:03,083 | INFO    | job_etl              | SCRAPED FOR ENRICHMENT: 0
+2026-05-22 22:15:10,006 | ERROR   | main | Missing one of GCP_PROJECT_ID / BQ_DATASET / BQ_TABLE in .env
+2026-05-22 22:22:49,356 | INFO    | main | Mode = live | APIs = ['adzuna', 'usajobs', 'jooble', 'themuse', 'remotive', 'arbeitnow'] | Roles = ['Data Analyst', 'Product Analyst', 'Marketing Analyst', 'Business Analyst', 'Business Intelligence Analyst', 'Financial Analyst', 'Operations Analyst', 'Data Scientist']
+2026-05-22 22:22:49,357 | INFO    | extractors | Dispatching 48 (api, role) tasks across 12 workers...
+2026-05-22 22:22:49,362 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,363 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,363 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,363 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,363 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,363 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,364 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:49,364 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:22:50,022 | WARNING | extractors | [api.adzuna.com] 429 -- backing off 1.7s (attempt 1/4)
+2026-05-22 22:23:04,781 | INFO    | extractors | Jooble  'Product Analyst               '  -> 200 rows
+2026-05-22 22:23:05,822 | INFO    | extractors | Jooble  'Data Analyst                  '  -> 200 rows
+2026-05-22 22:23:06,145 | INFO    | extractors | Jooble  'Business Analyst              '  -> 200 rows
+2026-05-22 22:23:06,148 | INFO    | extractors | Jooble  'Marketing Analyst             '  -> 200 rows
+2026-05-22 22:23:26,207 | INFO    | extractors | Jooble  'Financial Analyst             '  -> 200 rows
+2026-05-22 22:23:26,521 | INFO    | extractors | Jooble  'Business Intelligence Analyst '  -> 200 rows
+2026-05-22 22:23:27,024 | INFO    | extractors | Jooble  'Operations Analyst            '  -> 200 rows
+2026-05-22 22:23:27,644 | INFO    | extractors | Jooble  'Data Scientist                '  -> 200 rows
+2026-05-22 22:23:27,841 | INFO    | extractors | TheMuse 'Product Analyst               '  -> 2 rows
+2026-05-22 22:23:27,941 | INFO    | extractors | TheMuse 'Business Analyst              '  -> 0 rows
+2026-05-22 22:23:28,145 | INFO    | extractors | TheMuse 'Data Analyst                  '  -> 2 rows
+2026-05-22 22:23:28,444 | INFO    | extractors | TheMuse 'Operations Analyst            '  -> 0 rows
+2026-05-22 22:23:28,765 | INFO    | extractors | TheMuse 'Marketing Analyst             '  -> 1 rows
+2026-05-22 22:23:29,015 | INFO    | extractors | Remotive 'Data Analyst                 ' -> 19 rows
+2026-05-22 22:23:29,095 | INFO    | extractors | TheMuse 'Business Intelligence Analyst '  -> 2 rows
+2026-05-22 22:23:29,263 | INFO    | extractors | Remotive 'Product Analyst              ' -> 19 rows
+2026-05-22 22:23:29,371 | INFO    | extractors | Remotive 'Marketing Analyst            ' -> 19 rows
+2026-05-22 22:23:29,844 | INFO    | extractors | Remotive 'Business Intelligence Analyst' -> 19 rows
+2026-05-22 22:23:30,028 | INFO    | extractors | Remotive 'Business Analyst             ' -> 19 rows
+2026-05-22 22:23:30,284 | INFO    | extractors | Remotive 'Operations Analyst           ' -> 19 rows
+2026-05-22 22:23:30,331 | INFO    | extractors | Remotive 'Financial Analyst            ' -> 19 rows
+2026-05-22 22:23:30,339 | INFO    | extractors | TheMuse 'Data Scientist                '  -> 2 rows
+2026-05-22 22:23:30,651 | INFO    | extractors | Remotive 'Data Scientist               ' -> 19 rows
+2026-05-22 22:23:37,496 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=7 -- giving up
+2026-05-22 22:23:37,497 | INFO    | extractors | ArbeitNow 'Data Analyst                ' -> 1 rows
+2026-05-22 22:23:38,590 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=6 -- giving up
+2026-05-22 22:23:38,590 | INFO    | extractors | ArbeitNow 'Product Analyst             ' -> 1 rows
+2026-05-22 22:23:39,421 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=7 -- giving up
+2026-05-22 22:23:39,421 | INFO    | extractors | ArbeitNow 'Marketing Analyst           ' -> 0 rows
+2026-05-22 22:23:39,556 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:23:39,557 | INFO    | extractors | ArbeitNow 'Financial Analyst           ' -> 0 rows
+2026-05-22 22:23:39,697 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:23:39,697 | INFO    | extractors | ArbeitNow 'Operations Analyst          ' -> 0 rows
+2026-05-22 22:23:40,083 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=2 -- giving up
+2026-05-22 22:23:40,083 | INFO    | extractors | ArbeitNow 'Business Intelligence Analyst' -> 0 rows
+2026-05-22 22:23:40,226 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 22:23:40,226 | INFO    | extractors | ArbeitNow 'Business Analyst            ' -> 1 rows
+2026-05-22 22:23:42,278 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:23:42,278 | INFO    | extractors | ArbeitNow 'Data Scientist              ' -> 0 rows
+2026-05-22 22:23:45,875 | INFO    | extractors | Adzuna  'Product Analyst               '  -> 500 rows
+2026-05-22 22:23:46,192 | INFO    | extractors | Adzuna  'Data Analyst                  '  -> 500 rows
+2026-05-22 22:23:46,884 | INFO    | extractors | Adzuna  'Business Intelligence Analyst '  -> 500 rows
+2026-05-22 22:23:47,586 | INFO    | extractors | Adzuna  'Financial Analyst             '  -> 500 rows
+2026-05-22 22:23:47,797 | INFO    | extractors | Adzuna  'Marketing Analyst             '  -> 500 rows
+2026-05-22 22:23:48,409 | INFO    | extractors | Adzuna  'Operations Analyst            '  -> 500 rows
+2026-05-22 22:23:49,557 | INFO    | extractors | Adzuna  'Business Analyst              '  -> 500 rows
+2026-05-22 22:23:49,788 | INFO    | extractors | Adzuna  'Data Scientist                '  -> 500 rows
+2026-05-22 22:23:52,412 | INFO    | extractors | TheMuse 'Financial Analyst             '  -> 400 rows
+2026-05-22 22:23:52,414 | INFO    | extractors | Total raw rows collected: 6164
+2026-05-22 22:23:54,257 | INFO    | main | Enriched DataFrame: 6025 unique rows, 18 columns
+2026-05-22 22:23:54,750 | INFO    | etl_engine | Target table my-first-project-27273.data_job_market.us_job_data missing -- creating.
+2026-05-22 22:23:55,151 | INFO    | etl_engine | Loading 6025 rows to staging my-first-project-27273.data_job_market._stg_1779481435...
+2026-05-22 22:24:01,007 | INFO    | etl_engine | Running MERGE into my-first-project-27273.data_job_market.us_job_data...
+2026-05-22 22:46:04,382 | INFO    | main | Mode = live | APIs = ['adzuna', 'usajobs', 'jooble', 'themuse', 'remotive', 'arbeitnow'] | Roles = ['Data Analyst', 'Product Analyst', 'Marketing Analyst', 'Business Analyst', 'Business Intelligence Analyst', 'Financial Analyst', 'Operations Analyst', 'Data Scientist']
+2026-05-22 22:46:04,383 | INFO    | extractors | Dispatching 48 (api, role) tasks across 12 workers...
+2026-05-22 22:46:04,397 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,397 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,398 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,398 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,399 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,399 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,400 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:04,401 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 22:46:20,210 | INFO    | extractors | Jooble  'Product Analyst               '  -> 200 rows
+2026-05-22 22:46:21,587 | INFO    | extractors | Jooble  'Data Analyst                  '  -> 200 rows
+2026-05-22 22:46:22,193 | INFO    | extractors | Jooble  'Marketing Analyst             '  -> 200 rows
+2026-05-22 22:46:23,027 | INFO    | extractors | Jooble  'Business Analyst              '  -> 200 rows
+2026-05-22 22:46:32,908 | INFO    | extractors | Jooble  'Business Intelligence Analyst '  -> 200 rows
+2026-05-22 22:46:34,180 | INFO    | extractors | Jooble  'Financial Analyst             '  -> 200 rows
+2026-05-22 22:46:34,719 | INFO    | extractors | TheMuse 'Data Analyst                  '  -> 2 rows
+2026-05-22 22:46:34,727 | INFO    | extractors | Jooble  'Operations Analyst            '  -> 200 rows
+2026-05-22 22:46:34,962 | INFO    | extractors | Jooble  'Data Scientist                '  -> 200 rows
+2026-05-22 22:46:34,993 | INFO    | extractors | TheMuse 'Business Analyst              '  -> 0 rows
+2026-05-22 22:46:35,805 | INFO    | extractors | TheMuse 'Product Analyst               '  -> 2 rows
+2026-05-22 22:46:35,924 | INFO    | extractors | TheMuse 'Marketing Analyst             '  -> 1 rows
+2026-05-22 22:46:36,059 | INFO    | extractors | TheMuse 'Operations Analyst            '  -> 0 rows
+2026-05-22 22:46:36,145 | INFO    | extractors | TheMuse 'Business Intelligence Analyst '  -> 2 rows
+2026-05-22 22:46:36,284 | INFO    | extractors | Remotive 'Data Analyst                 ' -> 19 rows
+2026-05-22 22:46:36,389 | INFO    | extractors | Remotive 'Product Analyst              ' -> 19 rows
+2026-05-22 22:46:36,492 | INFO    | extractors | Remotive 'Marketing Analyst            ' -> 19 rows
+2026-05-22 22:46:36,587 | INFO    | extractors | Remotive 'Business Analyst             ' -> 19 rows
+2026-05-22 22:46:36,678 | INFO    | extractors | Remotive 'Business Intelligence Analyst' -> 19 rows
+2026-05-22 22:46:36,792 | INFO    | extractors | Remotive 'Financial Analyst            ' -> 19 rows
+2026-05-22 22:46:36,861 | INFO    | extractors | Remotive 'Operations Analyst           ' -> 19 rows
+2026-05-22 22:46:37,023 | INFO    | extractors | Remotive 'Data Scientist               ' -> 19 rows
+2026-05-22 22:46:37,074 | INFO    | extractors | TheMuse 'Data Scientist                '  -> 2 rows
+2026-05-22 22:46:42,152 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=6 -- giving up
+2026-05-22 22:46:42,153 | INFO    | extractors | ArbeitNow 'Marketing Analyst           ' -> 0 rows
+2026-05-22 22:46:42,666 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=6 -- giving up
+2026-05-22 22:46:42,667 | INFO    | extractors | ArbeitNow 'Product Analyst             ' -> 1 rows
+2026-05-22 22:46:42,813 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:46:42,813 | INFO    | extractors | ArbeitNow 'Business Intelligence Analyst' -> 0 rows
+2026-05-22 22:46:43,018 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:46:43,019 | INFO    | extractors | ArbeitNow 'Financial Analyst           ' -> 0 rows
+2026-05-22 22:46:43,155 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:46:43,156 | INFO    | extractors | ArbeitNow 'Operations Analyst          ' -> 0 rows
+2026-05-22 22:46:43,626 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=1 -- giving up
+2026-05-22 22:46:43,627 | INFO    | extractors | ArbeitNow 'Data Scientist              ' -> 0 rows
+2026-05-22 22:46:44,181 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 22:46:44,185 | INFO    | extractors | ArbeitNow 'Business Analyst            ' -> 1 rows
+2026-05-22 22:46:44,857 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=9 -- giving up
+2026-05-22 22:46:44,858 | INFO    | extractors | ArbeitNow 'Data Analyst                ' -> 1 rows
+2026-05-22 22:46:54,846 | INFO    | extractors | Adzuna  'Marketing Analyst             '  -> 500 rows
+2026-05-22 22:46:55,554 | INFO    | extractors | Adzuna  'Data Analyst                  '  -> 500 rows
+2026-05-22 22:46:55,719 | INFO    | extractors | Adzuna  'Business Intelligence Analyst '  -> 500 rows
+2026-05-22 22:46:56,217 | INFO    | extractors | TheMuse 'Financial Analyst             '  -> 400 rows
+2026-05-22 22:46:58,392 | INFO    | extractors | Adzuna  'Financial Analyst             '  -> 500 rows
+2026-05-22 22:46:59,048 | INFO    | extractors | Adzuna  'Product Analyst               '  -> 500 rows
+2026-05-22 22:46:59,422 | INFO    | extractors | Adzuna  'Operations Analyst            '  -> 500 rows
+2026-05-22 22:47:00,168 | INFO    | extractors | Adzuna  'Data Scientist                '  -> 500 rows
+2026-05-22 22:47:00,939 | INFO    | extractors | Adzuna  'Business Analyst              '  -> 500 rows
+2026-05-22 22:47:00,942 | INFO    | extractors | Total raw rows collected: 6164
+2026-05-22 22:47:05,648 | INFO    | main | Enriched DataFrame: 6025 unique rows, 18 columns
+2026-05-22 22:47:16,296 | INFO    | etl_engine | Target table my-first-project-27273.data_job_market.us_job_data missing -- creating.
+2026-05-22 22:47:17,955 | INFO    | etl_engine | Appending 6025 new unique rows to my-first-project-27273.data_job_market.us_job_data...
+2026-05-22 22:47:35,646 | INFO    | etl_engine | Load complete.
+2026-05-22 22:47:35,662 | INFO    | etl_engine | ================================================================
+2026-05-22 22:47:35,663 | INFO    | etl_engine | ENRICHMENT REPORT  rows=6164
+2026-05-22 22:47:35,663 | INFO    | etl_engine | ----------------------------------------------------------------
+2026-05-22 22:47:35,663 | INFO    | etl_engine |   industry         2874 /  6164  (46.6%)
+2026-05-22 22:47:35,663 | INFO    | etl_engine |   city             1995 /  6164  (32.4%)
+2026-05-22 22:47:35,664 | INFO    | etl_engine |   state            1884 /  6164  (30.6%)
+2026-05-22 22:47:35,664 | INFO    | etl_engine |   salary_min       3996 /  6164  (64.8%)
+2026-05-22 22:47:35,664 | INFO    | etl_engine |   salary_max       3995 /  6164  (64.8%)
+2026-05-22 22:47:35,665 | INFO    | etl_engine |   hard_skills      1743 /  6164  (28.3%)
+2026-05-22 22:47:35,665 | INFO    | etl_engine |   soft_skills      2179 /  6164  (35.4%)
+2026-05-22 22:47:35,665 | INFO    | etl_engine |   education         461 /  6164  (7.5%)
+2026-05-22 22:47:35,666 | INFO    | etl_engine |   benefits          708 /  6164  (11.5%)
+2026-05-22 22:47:35,666 | INFO    | etl_engine |   remote_status    6152 /  6164  (99.8%)
+2026-05-22 22:47:35,666 | INFO    | etl_engine | ================================================================
+2026-05-22 22:47:35,666 | INFO    | main | Pipeline finished. Total DML-affected rows: 6025
+2026-05-22 23:24:13,624 | INFO    | main | Mode = live | APIs = ['usajobs', 'themuse', 'remotive', 'arbeitnow'] | Roles = ['Data Analyst', 'Product Analyst', 'Marketing Analyst', 'Business Analyst', 'Business Intelligence Analyst', 'Financial Analyst', 'Operations Analyst', 'Data Scientist']
+2026-05-22 23:24:13,625 | INFO    | extractors | Dispatching 32 (api, role) tasks across 12 workers...
+2026-05-22 23:24:13,627 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,628 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,629 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,629 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,630 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,630 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,631 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:13,632 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:24:14,010 | INFO    | extractors | Remotive 'Data Analyst                 ' -> 19 rows
+2026-05-22 23:24:14,056 | INFO    | extractors | Remotive 'Product Analyst              ' -> 19 rows
+2026-05-22 23:24:14,150 | INFO    | extractors | Remotive 'Marketing Analyst            ' -> 19 rows
+2026-05-22 23:24:14,152 | INFO    | extractors | Remotive 'Business Analyst             ' -> 19 rows
+2026-05-22 23:24:14,323 | INFO    | extractors | Remotive 'Financial Analyst            ' -> 19 rows
+2026-05-22 23:24:14,329 | INFO    | extractors | Remotive 'Business Intelligence Analyst' -> 19 rows
+2026-05-22 23:24:14,391 | INFO    | extractors | Remotive 'Data Scientist               ' -> 19 rows
+2026-05-22 23:24:14,434 | INFO    | extractors | Remotive 'Operations Analyst           ' -> 19 rows
+2026-05-22 23:24:16,049 | INFO    | extractors | TheMuse 'Business Analyst              '  -> 0 rows
+2026-05-22 23:24:21,225 | INFO    | extractors | TheMuse 'Operations Analyst            '  -> 0 rows
+2026-05-22 23:24:22,252 | INFO    | extractors | TheMuse 'Data Analyst                  '  -> 2 rows
+2026-05-22 23:24:22,255 | INFO    | extractors | TheMuse 'Marketing Analyst             '  -> 1 rows
+2026-05-22 23:24:23,200 | INFO    | extractors | TheMuse 'Product Analyst               '  -> 2 rows
+2026-05-22 23:24:23,202 | INFO    | extractors | TheMuse 'Business Intelligence Analyst '  -> 2 rows
+2026-05-22 23:24:23,629 | INFO    | extractors | TheMuse 'Data Scientist                '  -> 2 rows
+2026-05-22 23:24:27,699 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 23:24:27,700 | INFO    | extractors | ArbeitNow 'Business Intelligence Analyst' -> 0 rows
+2026-05-22 23:24:27,925 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 23:24:27,926 | INFO    | extractors | ArbeitNow 'Financial Analyst           ' -> 0 rows
+2026-05-22 23:24:28,886 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 23:24:28,887 | INFO    | extractors | ArbeitNow 'Data Scientist              ' -> 0 rows
+2026-05-22 23:24:29,332 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=4 -- giving up
+2026-05-22 23:24:29,333 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 23:24:29,335 | INFO    | extractors | ArbeitNow 'Product Analyst             ' -> 1 rows
+2026-05-22 23:24:29,335 | INFO    | extractors | ArbeitNow 'Operations Analyst          ' -> 0 rows
+2026-05-22 23:24:29,598 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=4 -- giving up
+2026-05-22 23:24:29,600 | INFO    | extractors | ArbeitNow 'Data Analyst                ' -> 1 rows
+2026-05-22 23:24:29,629 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=5 -- giving up
+2026-05-22 23:24:29,630 | INFO    | extractors | ArbeitNow 'Marketing Analyst           ' -> 0 rows
+2026-05-22 23:24:30,111 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=5 -- giving up
+2026-05-22 23:24:30,113 | INFO    | extractors | ArbeitNow 'Business Analyst            ' -> 2 rows
+2026-05-22 23:24:46,629 | INFO    | extractors | TheMuse 'Financial Analyst             '  -> 400 rows
+2026-05-22 23:24:46,633 | INFO    | extractors | Total raw rows collected: 565
+2026-05-22 23:24:49,081 | INFO    | main | Enriched DataFrame: 426 unique rows, 18 columns
+2026-05-22 23:24:49,766 | INFO    | etl_engine | Target table my-first-project-27273.data_job_market.us_job_data missing -- creating.
+2026-05-22 23:24:51,619 | INFO    | etl_engine | Appending 426 new unique rows to my-first-project-27273.data_job_market.us_job_data...
+2026-05-22 23:24:55,308 | INFO    | etl_engine | Load complete.
+2026-05-22 23:24:55,308 | INFO    | etl_engine | ================================================================
+2026-05-22 23:24:55,309 | INFO    | etl_engine | ENRICHMENT REPORT  rows=565
+2026-05-22 23:24:55,309 | INFO    | etl_engine | ----------------------------------------------------------------
+2026-05-22 23:24:55,310 | INFO    | etl_engine |   industry          400 /   565  (70.8%)
+2026-05-22 23:24:55,310 | INFO    | etl_engine |   city              333 /   565  (58.9%)
+2026-05-22 23:24:55,310 | INFO    | etl_engine |   state             317 /   565  (56.1%)
+2026-05-22 23:24:55,311 | INFO    | etl_engine |   salary_min          0 /   565  (0.0%)
+2026-05-22 23:24:55,311 | INFO    | etl_engine |   salary_max          0 /   565  (0.0%)
+2026-05-22 23:24:55,311 | INFO    | etl_engine |   hard_skills       423 /   565  (74.9%)
+2026-05-22 23:24:55,312 | INFO    | etl_engine |   soft_skills       543 /   565  (96.1%)
+2026-05-22 23:24:55,312 | INFO    | etl_engine |   education         346 /   565  (61.2%)
+2026-05-22 23:24:55,313 | INFO    | etl_engine |   benefits          398 /   565  (70.4%)
+2026-05-22 23:24:55,313 | INFO    | etl_engine |   remote_status     553 /   565  (97.9%)
+2026-05-22 23:24:55,313 | INFO    | etl_engine | ================================================================
+2026-05-22 23:24:55,314 | INFO    | main | Pipeline finished. Total DML-affected rows: 426
+2026-05-22 23:48:58,507 | INFO    | main | Mode = live | APIs = ['usajobs', 'themuse', 'remotive', 'arbeitnow'] | Roles = ['Data Analyst', 'Product Analyst', 'Marketing Analyst', 'Business Analyst', 'Business Intelligence Analyst', 'Financial Analyst', 'Operations Analyst', 'Data Scientist']
+2026-05-22 23:48:58,507 | INFO    | extractors | Dispatching 32 (api, role) tasks across 12 workers...
+2026-05-22 23:48:58,508 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,509 | INFO    | extractors | USAJobs credentials missing -- skipping.
+2026-05-22 23:48:58,643 | INFO    | extractors | Remotive 'Data Analyst                 ' -> 19 rows
+2026-05-22 23:48:58,663 | INFO    | extractors | Remotive 'Business Analyst             ' -> 19 rows
+2026-05-22 23:48:58,665 | INFO    | extractors | Remotive 'Marketing Analyst            ' -> 19 rows
+2026-05-22 23:48:58,673 | INFO    | extractors | Remotive 'Product Analyst              ' -> 19 rows
+2026-05-22 23:48:58,800 | INFO    | extractors | Remotive 'Data Scientist               ' -> 19 rows
+2026-05-22 23:48:58,815 | INFO    | extractors | Remotive 'Business Intelligence Analyst' -> 19 rows
+2026-05-22 23:48:58,817 | INFO    | extractors | Remotive 'Financial Analyst            ' -> 19 rows
+2026-05-22 23:48:58,828 | INFO    | extractors | Remotive 'Operations Analyst           ' -> 19 rows
+2026-05-22 23:48:59,135 | INFO    | extractors | TheMuse 'Business Analyst              '  -> 0 rows
+2026-05-22 23:48:59,449 | INFO    | extractors | TheMuse 'Operations Analyst            '  -> 0 rows
+2026-05-22 23:49:00,149 | INFO    | extractors | TheMuse 'Data Analyst                  '  -> 2 rows
+2026-05-22 23:49:00,521 | INFO    | extractors | TheMuse 'Product Analyst               '  -> 2 rows
+2026-05-22 23:49:00,722 | INFO    | extractors | TheMuse 'Marketing Analyst             '  -> 1 rows
+2026-05-22 23:49:00,792 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=3 -- giving up
+2026-05-22 23:49:00,792 | INFO    | extractors | ArbeitNow 'Business Analyst            ' -> 1 rows
+2026-05-22 23:49:00,836 | INFO    | extractors | TheMuse 'Business Intelligence Analyst '  -> 2 rows
+2026-05-22 23:49:01,178 | INFO    | extractors | TheMuse 'Data Scientist                '  -> 2 rows
+2026-05-22 23:49:01,255 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=4 -- giving up
+2026-05-22 23:49:01,255 | INFO    | extractors | ArbeitNow 'Marketing Analyst           ' -> 0 rows
+2026-05-22 23:49:01,275 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=2 -- giving up
+2026-05-22 23:49:01,276 | INFO    | extractors | ArbeitNow 'Operations Analyst          ' -> 0 rows
+2026-05-22 23:49:01,458 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=4 -- giving up
+2026-05-22 23:49:01,459 | INFO    | extractors | ArbeitNow 'Business Intelligence Analyst' -> 0 rows
+2026-05-22 23:49:01,485 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=2 -- giving up
+2026-05-22 23:49:01,485 | INFO    | extractors | ArbeitNow 'Data Scientist              ' -> 0 rows
+2026-05-22 23:49:01,562 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=4 -- giving up
+2026-05-22 23:49:01,563 | INFO    | extractors | ArbeitNow 'Data Analyst                ' -> 1 rows
+2026-05-22 23:49:02,176 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=5 -- giving up
+2026-05-22 23:49:02,177 | INFO    | extractors | ArbeitNow 'Financial Analyst           ' -> 0 rows
+2026-05-22 23:49:02,180 | WARNING | extractors | [www.arbeitnow.com] 403 for https://www.arbeitnow.com/api/job-board-api?page=5 -- giving up
+2026-05-22 23:49:02,181 | INFO    | extractors | ArbeitNow 'Product Analyst             ' -> 1 rows
+2026-05-22 23:49:19,790 | INFO    | extractors | TheMuse 'Financial Analyst             '  -> 400 rows
+2026-05-22 23:49:19,792 | INFO    | extractors | Total raw rows collected: 564
+2026-05-22 23:49:20,043 | INFO    | main | Enriched DataFrame: 161 unique rows, 18 columns
+2026-05-22 23:49:25,719 | INFO    | etl_engine | ================================================================
+2026-05-22 23:49:25,719 | INFO    | etl_engine | ENRICHMENT REPORT  rows=171
+2026-05-22 23:49:25,720 | INFO    | etl_engine | ----------------------------------------------------------------
+2026-05-22 23:49:25,720 | INFO    | etl_engine |   industry          110 /   171  (64.3%)
+2026-05-22 23:49:25,720 | INFO    | etl_engine |   city              137 /   171  (80.1%)
+2026-05-22 23:49:25,720 | INFO    | etl_engine |   state             129 /   171  (75.4%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   salary_min         34 /   171  (19.9%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   salary_max         34 /   171  (19.9%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   hard_skills       134 /   171  (78.4%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   soft_skills       167 /   171  (97.7%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   education         128 /   171  (74.9%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   benefits          139 /   171  (81.3%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine |   remote_status     165 /   171  (96.5%)
+2026-05-22 23:49:25,721 | INFO    | etl_engine | ================================================================
+2026-05-22 23:49:25,721 | INFO    | main | Pipeline finished. Total DML-affected rows: 161
