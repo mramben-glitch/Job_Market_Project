@@ -1,4 +1,4 @@
-name: Weekly Automated Job Market Pipeline
+name: Daily Automated Job Market Pipeline
 
 on:
   schedule:
