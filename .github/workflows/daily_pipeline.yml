@@ -3,7 +3,7 @@ name: Weekly Automated Job Market Pipeline
 on:
   schedule:
     # Triggers every Sunday night at exactly midnight UTC
-    - cron: '0 0 * * 0'
+    - cron: '0 8 * * *'
   workflow_dispatch:
     # Keeps the manual "Run workflow" trigger active for on-demand testing
 

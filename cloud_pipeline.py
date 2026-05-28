@@ -120,7 +120,7 @@ def main():
     deduplicated_jobs = {}
     metrics = {"harvested": 0, "processed": 0, "enriched": 0, "fallback_raw": 0, "exhausted_raw": 0, "loaded": 0}
 
-    log.info("Launching production-grade fortified weekly cloud harvest pipeline...")
+    log.info("Launching production-grade fortified daily cloud harvest pipeline...")
 
     with httpx.Client() as client:
         for q in queries:
@@ -129,7 +129,7 @@ def main():
                     params = {
                         "query": q, 
                         "page": str(page_num), 
-                        "date_posted": "week", 
+                        "date_posted": "today", 
                         "country": "us", 
                         "remote_jobs_only": "false"
                     }
