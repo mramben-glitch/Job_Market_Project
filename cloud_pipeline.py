@@ -87,6 +87,12 @@ def process_single_job_with_retry(job):
         )
         
         structured_data = json.loads(response.text)
+        
+        # Convert list fields to comma-separated strings for BigQuery STRING columns
+        for list_field in ["tools", "hard_skills"]:
+            if isinstance(structured_data.get(list_field), list):
+                structured_data[list_field] = ", ".join(str(item) for item in structured_data[list_field])
+        
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
         structured_data["job_apply_link"] = job.get("job_apply_link")
