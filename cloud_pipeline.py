@@ -54,16 +54,37 @@ def calculate_completeness(job):
     return score
 
 
+def fetch_known_job_ids():
+    """Query BigQuery for job_ids from the last 30 days to enable cross-run deduplication.
+    Returns a set of job_id strings already in the table.
+    
+    Failure mode: if the query fails, returns an empty set and the pipeline proceeds
+    without dedup. Logged as a warning but not fatal.
+    """
+    try:
+        query = f"""
+        SELECT DISTINCT job_id 
+        FROM `{TABLE_ID}` 
+        WHERE job_id IS NOT NULL 
+          AND date_retrieved >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+        """
+        result = bq_client.query(query).result()
+        known_ids = {row.job_id for row in result if row.job_id}
+        log.info(f"Cross-run dedup: loaded {len(known_ids)} known job_ids from last 30 days.")
+        return known_ids
+    except Exception as e:
+        log.warning(f"Cross-run dedup query failed (proceeding without dedup): {e}")
+        return set()
+
+
 def derive_source_api(job):
     """Determine which job board this listing came from.
     Prefer JSearch's job_publisher field, fall back to URL domain parsing."""
     
-    # JSearch provides this directly - source of truth
     publisher = job.get("job_publisher")
     if publisher:
         return publisher
     
-    # Fallback: parse the domain from job_apply_link
     url = job.get("job_apply_link", "")
     if not url:
         return "Unknown"
@@ -71,7 +92,6 @@ def derive_source_api(job):
     try:
         domain = urlparse(url).netloc.lower().replace("www.", "")
         
-        # Map known domains to clean platform names
         domain_map = {
             "linkedin.com": "LinkedIn",
             "indeed.com": "Indeed",
@@ -102,11 +122,9 @@ def derive_source_api(job):
             if known in domain:
                 return clean_name
         
-        # Company career pages typically follow jobs.<company>.com or careers.<company>.com
         if domain.startswith("jobs.") or domain.startswith("careers."):
             return "Company Career Page"
         
-        # Unknown but valid URL - return the bare domain
         return domain
         
     except Exception:
@@ -121,8 +139,6 @@ def process_single_job_with_retry(job):
     if not raw_description:
         return None, "fallback_raw"
 
-    # JSearch already provides some structured fields - feed them to Gemini as hints
-    # so it can verify/enrich rather than re-extract from scratch
     upstream_hints = {
         "employer_name": job.get("employer_name"),
         "job_title": job.get("job_title"),
@@ -179,17 +195,14 @@ Return JSON with exactly these fields:
         
         structured_data = json.loads(response.text)
         
-        # Guard against unexpected non-dict responses from Gemini
         if not isinstance(structured_data, dict):
             log.warning(f"Gemini returned non-dict for job {job.get('job_id')}, skipping.")
             return None, "fallback_raw"
         
-        # Convert list fields to comma-separated strings for BigQuery STRING columns
         for list_field in ["tools", "hard_skills", "soft_skills", "benefits"]:
             if isinstance(structured_data.get(list_field), list):
                 structured_data[list_field] = ", ".join(str(item) for item in structured_data[list_field])
         
-        # SALARY FALLBACK: if Gemini returned null but JSearch has the data, use JSearch's value
         if structured_data.get("salary_min") is None and job.get("job_min_salary") is not None:
             try:
                 structured_data["salary_min"] = float(job.get("job_min_salary"))
@@ -201,7 +214,6 @@ Return JSON with exactly these fields:
             except (ValueError, TypeError):
                 pass
         
-        # Metadata fields - mapped to match BigQuery table schema exactly
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
         structured_data["job_url"] = job.get("job_apply_link")
@@ -222,11 +234,19 @@ def main():
     start_time = time.time()
     
     queries = [
-        "Data Analyst or Product Analyst in USA",
+        "Data Analyst in USA",
+        "Business Analyst in USA",
         "Business Intelligence Analyst in USA",
+        "BI Analyst in USA",
         "Data Scientist in USA",
-        "Marketing Analyst or Finance Analyst in USA",
-        "Operations Analyst or Healthcare Analyst in USA"
+        "Marketing Analyst in USA",
+        "Finance Analyst in USA",
+        "Healthcare Analyst in USA",
+        "Operations Analyst in USA",
+        "Product Analyst in USA",
+        "Risk Analyst in USA",
+        "Logistics Analyst in USA",
+        "Supply Chain Analyst in USA",
     ]
     
     headers = {
@@ -234,14 +254,26 @@ def main():
         "x-rapidapi-host": "jsearch.p.rapidapi.com"
     }
 
+    # CROSS-RUN DEDUP: load known job_ids from last 30 days BEFORE harvesting
+    known_job_ids = fetch_known_job_ids()
+    
     deduplicated_jobs = {}
-    metrics = {"harvested": 0, "processed": 0, "enriched": 0, "fallback_raw": 0, "exhausted_raw": 0, "loaded": 0}
+    metrics = {
+        "harvested": 0, 
+        "skipped_cross_run": 0,
+        "processed": 0, 
+        "enriched": 0, 
+        "fallback_raw": 0, 
+        "exhausted_raw": 0, 
+        "loaded": 0
+    }
 
     log.info("Launching production-grade fortified daily cloud harvest pipeline...")
 
     with httpx.Client() as client:
         for q in queries:
-            for page_num in range(1, 6):
+            # 4 pages per query - balances coverage with Gemini's 500 RPD cap
+            for page_num in range(1, 5):
                 try:
                     params = {
                         "query": q, 
@@ -259,6 +291,11 @@ def main():
                             
                         for job in job_data_list:
                             metrics["harvested"] += 1
+                            
+                            # CROSS-RUN DEDUP: skip jobs already in BigQuery from previous runs
+                            if job.get("job_id") in known_job_ids:
+                                metrics["skipped_cross_run"] += 1
+                                continue
                             
                             company_clean = str(job.get("employer_name", "")).strip().lower()
                             title_clean = str(job.get("job_title", "")).strip().lower()
@@ -303,7 +340,6 @@ def main():
             log.critical("Consecutive rate limits exhausted. Aborting loop processing early to safeguard data logs.")
             break
 
-    # SAFETY NET: always dump enriched rows to a backup file BEFORE attempting BigQuery insert
     if buffer:
         backup_filename = f"enriched_backup_{int(time.time())}.json"
         try:
@@ -313,7 +349,6 @@ def main():
         except Exception as backup_err:
             log.error(f"Failed to write backup file: {backup_err}")
 
-    # Bulk load chunking strategy
     if buffer:
         chunk_size = 50
         for i in range(0, len(buffer), chunk_size):
@@ -327,7 +362,16 @@ def main():
                 log.error(f"BigQuery validation rejection on batch window {i}-{i+chunk_size}: {bq_err}")
 
     elapsed = int(time.time() - start_time)
-    summary_string = f"METRICS_SUMMARY: harvested={metrics['harvested']}, unique={total_to_process}, enriched={metrics['enriched']}, fallback={metrics['fallback_raw']}, exhausted={metrics['exhausted_raw']}, loaded={metrics['loaded']}, runtime_seconds={elapsed}"
+    summary_string = (
+        f"METRICS_SUMMARY: harvested={metrics['harvested']}, "
+        f"skipped_cross_run={metrics['skipped_cross_run']}, "
+        f"unique={total_to_process}, "
+        f"enriched={metrics['enriched']}, "
+        f"fallback={metrics['fallback_raw']}, "
+        f"exhausted={metrics['exhausted_raw']}, "
+        f"loaded={metrics['loaded']}, "
+        f"runtime_seconds={elapsed}"
+    )
     print(summary_string)
     log.info(summary_string)
 
