@@ -4,6 +4,7 @@ import logging
 import httpx
 import json
 import base64
+from urllib.parse import urlparse
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from google import genai
@@ -43,6 +44,7 @@ except Exception as e:
 # Initialize Gemini Client
 ai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+
 def calculate_completeness(job):
     score = 0
     fields_to_check = ["job_description", "job_salary", "job_highlights", "job_required_skills"]
@@ -50,6 +52,66 @@ def calculate_completeness(job):
         if job.get(field):
             score += 1
     return score
+
+
+def derive_source_api(job):
+    """Determine which job board this listing came from.
+    Prefer JSearch's job_publisher field, fall back to URL domain parsing."""
+    
+    # JSearch provides this directly - source of truth
+    publisher = job.get("job_publisher")
+    if publisher:
+        return publisher
+    
+    # Fallback: parse the domain from job_apply_link
+    url = job.get("job_apply_link", "")
+    if not url:
+        return "Unknown"
+    
+    try:
+        domain = urlparse(url).netloc.lower().replace("www.", "")
+        
+        # Map known domains to clean platform names
+        domain_map = {
+            "linkedin.com": "LinkedIn",
+            "indeed.com": "Indeed",
+            "ziprecruiter.com": "ZipRecruiter",
+            "glassdoor.com": "Glassdoor",
+            "monster.com": "Monster",
+            "dice.com": "Dice",
+            "simplyhired.com": "SimplyHired",
+            "careerbuilder.com": "CareerBuilder",
+            "lensa.com": "Lensa",
+            "learn4good.com": "Learn4Good",
+            "jobleads.com": "JobLeads",
+            "bebee.com": "beBee",
+            "talent.com": "Talent.com",
+            "jooble.org": "Jooble",
+            "whatjobs.com": "WhatJobs",
+            "theladders.com": "TheLadders",
+            "jobilize.com": "Jobilize",
+            "tealhq.com": "Teal",
+            "builtinnyc.com": "Built In NYC",
+            "adzuna.com": "Adzuna",
+            "dailyremote.com": "DailyRemote",
+            "jobgether.com": "Jobgether",
+            "snagajob.com": "Snagajob",
+        }
+        
+        for known, clean_name in domain_map.items():
+            if known in domain:
+                return clean_name
+        
+        # Company career pages typically follow jobs.<company>.com or careers.<company>.com
+        if domain.startswith("jobs.") or domain.startswith("careers."):
+            return "Company Career Page"
+        
+        # Unknown but valid URL - return the bare domain
+        return domain
+        
+    except Exception:
+        return "Unknown"
+
 
 def process_single_job_with_retry(job):
     # 4.5s throttle = ~13 RPM theoretical, safely under the 15 RPM limit for Flash Lite 3.1
@@ -77,7 +139,9 @@ def process_single_job_with_retry(job):
     }
 
     prompt = f"""You are a data analyst assistant. Analyze the following job posting and return ALL fields as JSON.
-Fill every field with your best inference from the description and the upstream hints. Only use null for truly unknowable values (e.g. salary not stated anywhere).
+Fill every field with your best inference from the description and the upstream hints. Only use null for truly unknowable values.
+
+CRITICAL: If the UPSTREAM API STRUCTURED DATA contains job_min_salary or job_max_salary, you MUST use those exact numbers - do not return null for salary if upstream provides them.
 
 UPSTREAM API STRUCTURED DATA (use as source of truth where available):
 {json.dumps(upstream_hints, default=str)}
@@ -92,8 +156,8 @@ Return JSON with exactly these fields:
 - city (string): city name only
 - state (string): full state name, e.g. "California", not "CA"
 - description (string): a 1-2 sentence summary of the role's purpose
-- salary_min (float or null): annual USD; convert hourly (x2080) or monthly (x12) if needed
-- salary_max (float or null): annual USD; if only one figure given, use it for both
+- salary_min (float or null): annual USD; use upstream value if available; convert hourly (x2080) or monthly (x12) if needed
+- salary_max (float or null): annual USD; use upstream value if available; if only one figure given, use it for both
 - tools (list of strings): software/platforms, e.g. ["Python", "SQL", "Tableau", "AWS"]
 - hard_skills (list of strings): technical competencies, e.g. ["Data Modeling", "ETL", "Statistical Analysis"]
 - soft_skills (list of strings): interpersonal/cognitive, e.g. ["Communication", "Problem Solving"]
@@ -125,10 +189,23 @@ Return JSON with exactly these fields:
             if isinstance(structured_data.get(list_field), list):
                 structured_data[list_field] = ", ".join(str(item) for item in structured_data[list_field])
         
+        # SALARY FALLBACK: if Gemini returned null but JSearch has the data, use JSearch's value
+        if structured_data.get("salary_min") is None and job.get("job_min_salary") is not None:
+            try:
+                structured_data["salary_min"] = float(job.get("job_min_salary"))
+            except (ValueError, TypeError):
+                pass
+        if structured_data.get("salary_max") is None and job.get("job_max_salary") is not None:
+            try:
+                structured_data["salary_max"] = float(job.get("job_max_salary"))
+            except (ValueError, TypeError):
+                pass
+        
         # Metadata fields - mapped to match BigQuery table schema exactly
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
         structured_data["job_url"] = job.get("job_apply_link")
+        structured_data["source_api"] = derive_source_api(job)
         
         return structured_data, "enriched"
         
@@ -139,6 +216,7 @@ Return JSON with exactly these fields:
         
         log.warning(f"Failed to enrich job {job.get('job_id')}: {gemini_err}")
         return None, "fallback_raw"
+
 
 def main():
     start_time = time.time()
@@ -226,7 +304,6 @@ def main():
             break
 
     # SAFETY NET: always dump enriched rows to a backup file BEFORE attempting BigQuery insert
-    # This way, if BigQuery rejects the batch, we can recover the data from the workflow artifact
     if buffer:
         backup_filename = f"enriched_backup_{int(time.time())}.json"
         try:
@@ -253,6 +330,7 @@ def main():
     summary_string = f"METRICS_SUMMARY: harvested={metrics['harvested']}, unique={total_to_process}, enriched={metrics['enriched']}, fallback={metrics['fallback_raw']}, exhausted={metrics['exhausted_raw']}, loaded={metrics['loaded']}, runtime_seconds={elapsed}"
     print(summary_string)
     log.info(summary_string)
+
 
 if __name__ == "__main__":
     main()
