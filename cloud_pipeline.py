@@ -28,13 +28,11 @@ TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_NAME}"
 try:
     sa_key_b64 = os.getenv("GCP_SA_KEY_B64")
     if sa_key_b64:
-        # Decode the uncorruptible base64 key string back into raw JSON strings
         raw_json_bytes = base64.b64decode(sa_key_b64)
         info = json.loads(raw_json_bytes.decode("utf-8"))
         credentials = service_account.Credentials.from_service_account_info(info)
         bq_client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
     else:
-        # Local Desktop Testing fallback
         bq_client = bigquery.Client(project=PROJECT_ID)
         
     log.info("Authenticated BigQuery via Secure Base64 Token.")
@@ -54,8 +52,8 @@ def calculate_completeness(job):
     return score
 
 def process_single_job_with_retry(job):
-    # Safe 6.0s throttle cushion for Gemini Free Tier
-    time.sleep(6.0)
+    # 4.5s throttle = ~13 RPM theoretical, safely under the 15 RPM limit for Flash Lite 3.1
+    time.sleep(4.5)
     
     raw_description = job.get("job_description", "")
     if not raw_description:
@@ -79,7 +77,7 @@ def process_single_job_with_retry(job):
 
     try:
         response = ai_client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.1-flash-lite',
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json"
