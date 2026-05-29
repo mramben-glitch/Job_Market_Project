@@ -2,10 +2,8 @@ name: Daily Automated Job Market Pipeline
 
 on:
   schedule:
-    # Triggers every Sunday night at exactly midnight UTC
     - cron: '0 8 * * *'
   workflow_dispatch:
-    # Keeps the manual "Run workflow" trigger active for on-demand testing
 
 jobs:
   run-pipeline:
@@ -64,6 +62,15 @@ jobs:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
           GCP_SA_KEY_B64: ${{ secrets.GCP_SA_KEY_B64 }}
+
+      - name: Upload enriched backup artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: enriched-rows-backup
+          path: enriched_backup_*.json
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Generate Step Summary Metrics
         run: |

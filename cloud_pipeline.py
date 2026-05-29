@@ -3,7 +3,7 @@ import time
 import logging
 import httpx
 import json
-import base64  # Handles the secure Base64 conversion
+import base64
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from google import genai
@@ -59,21 +59,50 @@ def process_single_job_with_retry(job):
     if not raw_description:
         return None, "fallback_raw"
 
-    prompt = f"""
-    You are a data analyst assistant. Analyze the following job posting description and extract the data fields exactly in JSON format.
-    Fields to extract:
-    - job_title (string)
-    - company (string)
-    - city (string)
-    - state (string)
-    - tools (list of strings, e.g., ['Python', 'SQL', 'Power BI'])
-    - hard_skills (list of strings, e.g., ['Data Modeling', 'ETL'])
-    - salary_min (float or null)
-    - salary_max (float or null)
+    # JSearch already provides some structured fields - feed them to Gemini as hints
+    # so it can verify/enrich rather than re-extract from scratch
+    upstream_hints = {
+        "employer_name": job.get("employer_name"),
+        "job_title": job.get("job_title"),
+        "job_city": job.get("job_city"),
+        "job_state": job.get("job_state"),
+        "job_country": job.get("job_country"),
+        "job_employment_type": job.get("job_employment_type"),
+        "job_min_salary": job.get("job_min_salary"),
+        "job_max_salary": job.get("job_max_salary"),
+        "job_is_remote": job.get("job_is_remote"),
+        "job_posted_at_datetime_utc": job.get("job_posted_at_datetime_utc"),
+        "job_highlights": job.get("job_highlights"),
+        "employer_company_type": job.get("employer_company_type"),
+    }
 
-    Job Description:
-    {raw_description}
-    """
+    prompt = f"""You are a data analyst assistant. Analyze the following job posting and return ALL fields as JSON.
+Fill every field with your best inference from the description and the upstream hints. Only use null for truly unknowable values (e.g. salary not stated anywhere).
+
+UPSTREAM API STRUCTURED DATA (use as source of truth where available):
+{json.dumps(upstream_hints, default=str)}
+
+JOB DESCRIPTION:
+{raw_description}
+
+Return JSON with exactly these fields:
+- job_title (string): clean canonical title
+- company (string): employer name
+- industry (string): infer from company + description, e.g. "Healthcare", "Finance", "Technology", "Retail"
+- city (string): city name only
+- state (string): full state name, e.g. "California", not "CA"
+- description (string): a 1-2 sentence summary of the role's purpose
+- salary_min (float or null): annual USD; convert hourly (x2080) or monthly (x12) if needed
+- salary_max (float or null): annual USD; if only one figure given, use it for both
+- tools (list of strings): software/platforms, e.g. ["Python", "SQL", "Tableau", "AWS"]
+- hard_skills (list of strings): technical competencies, e.g. ["Data Modeling", "ETL", "Statistical Analysis"]
+- soft_skills (list of strings): interpersonal/cognitive, e.g. ["Communication", "Problem Solving"]
+- remote_status (string): one of "Remote", "On-site", "Hybrid", or "Unspecified"
+- employment_type (string): one of "Full-time", "Part-time", "Contract", "Internship", or "Unspecified"
+- benefits (list of strings): e.g. ["Health Insurance", "401k", "PTO", "Stock Options"]
+- education (string): minimum required, e.g. "Bachelor's Degree", "Master's Degree", "High School", "Unspecified"
+- date_posted (string): ISO date YYYY-MM-DD from the posted_at_datetime field, or today if missing
+"""
 
     try:
         response = ai_client.models.generate_content(
@@ -86,14 +115,20 @@ def process_single_job_with_retry(job):
         
         structured_data = json.loads(response.text)
         
+        # Guard against unexpected non-dict responses from Gemini
+        if not isinstance(structured_data, dict):
+            log.warning(f"Gemini returned non-dict for job {job.get('job_id')}, skipping.")
+            return None, "fallback_raw"
+        
         # Convert list fields to comma-separated strings for BigQuery STRING columns
-        for list_field in ["tools", "hard_skills"]:
+        for list_field in ["tools", "hard_skills", "soft_skills", "benefits"]:
             if isinstance(structured_data.get(list_field), list):
                 structured_data[list_field] = ", ".join(str(item) for item in structured_data[list_field])
         
+        # Metadata fields - mapped to match BigQuery table schema exactly
         structured_data["job_id"] = job.get("job_id")
         structured_data["date_retrieved"] = time.strftime("%Y-%m-%d")
-        structured_data["job_apply_link"] = job.get("job_apply_link")
+        structured_data["job_url"] = job.get("job_apply_link")
         
         return structured_data, "enriched"
         
@@ -189,6 +224,17 @@ def main():
         if consecutive_exhaustions >= 3:
             log.critical("Consecutive rate limits exhausted. Aborting loop processing early to safeguard data logs.")
             break
+
+    # SAFETY NET: always dump enriched rows to a backup file BEFORE attempting BigQuery insert
+    # This way, if BigQuery rejects the batch, we can recover the data from the workflow artifact
+    if buffer:
+        backup_filename = f"enriched_backup_{int(time.time())}.json"
+        try:
+            with open(backup_filename, "w") as f:
+                json.dump(buffer, f, indent=2, default=str)
+            log.info(f"Backup written: {backup_filename} ({len(buffer)} rows)")
+        except Exception as backup_err:
+            log.error(f"Failed to write backup file: {backup_err}")
 
     # Bulk load chunking strategy
     if buffer:
